@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "NexaERP - Product Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "warehouseId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"P001\",\n  \"productName\": \"Dell Laptop\",\n  \"category\": \"Electronics\",\n  \"purchasePrice\": 45000,\n  \"sellingPrice\": 50000,\n  \"gstPercentage\": 18,\n  \"stockQuantity\": 20,\n  \"minimumStock\": 5,\n  \"description\": \"Dell Inspiron Laptop\",\n  \"status\": \"ACTIVE\",\n  \"warehouseId\": \"{{warehouseId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/products",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Create a new product in the system"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "",
+                  "if (response.success && response.data?.id) {",
+                  "    pm.environment.set(\"productId\", response.data.id);",
+                  "    console.log(\"Product ID saved:\", response.data.id);",
+                  "} else {",
+                  "    console.log(\"Failed to save product ID\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/products",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Retrieve all products from the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/products/{{productId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "products", "{{productId}}"]
+            },
+            "description": "Retrieve a specific product by their ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productName\": \"Dell Laptop Updated\",\n  \"category\": \"Computers\",\n  \"purchasePrice\": 46000,\n  \"sellingPrice\": 55000,\n  \"gstPercentage\": 18,\n  \"stockQuantity\": 25,\n  \"minimumStock\": 10,\n  \"description\": \"Dell Inspiron Laptop - Updated specs\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/products/{{productId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "products", "{{productId}}"]
+            },
+            "description": "Update an existing product's information"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/products/{{productId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "products", "{{productId}}"]
+            },
+            "description": "Delete a product from the system"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

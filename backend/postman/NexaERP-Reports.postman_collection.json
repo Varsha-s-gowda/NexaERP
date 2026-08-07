@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "NexaERP - Reports Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Sales Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/reports/sales",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "reports", "sales"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "",
+                  "description": "Optional: Filter by start date (YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "description": "Optional: Filter by end date (YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "customerId",
+                  "value": "",
+                  "description": "Optional: Filter by customer ID",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Optional: Filter by status (DRAFT, CONFIRMED, CANCELLED)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve sales report with optional filters for date range, customer, and status"
+          },
+          "response": []
+        },
+        {
+          "name": "Inventory Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/reports/inventory",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "reports", "inventory"]
+            },
+            "description": "Retrieve inventory report including current stock, minimum stock, warehouse, and value calculations"
+          },
+          "response": []
+        },
+        {
+          "name": "Customer Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/reports/customers",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "reports", "customers"]
+            },
+            "description": "Retrieve customer report including purchase count, revenue, and last purchase date"
+          },
+          "response": []
+        },
+        {
+          "name": "Product Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/reports/products",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "reports", "products"]
+            },
+            "description": "Retrieve product report including sales count, quantity sold, revenue, and current stock"
+          },
+          "response": []
+        },
+        {
+          "name": "Top Selling Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/reports/top-selling",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "reports", "top-selling"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Optional: Number of top products to return (default: 10)"
+                }
+              ]
+            },
+            "description": "Retrieve top selling products sorted by quantity sold"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

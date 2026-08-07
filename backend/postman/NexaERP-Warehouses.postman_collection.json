@@ -1,0 +1,159 @@
+{
+  "info": {
+    "name": "NexaERP - Warehouse Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "warehouseId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Warehouses",
+      "item": [
+        {
+          "name": "Create Warehouse",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Main Warehouse\",\n  \"location\": \"Bangalore\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/warehouses",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "warehouses"]
+            },
+            "description": "Create a new warehouse in the system"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "",
+                  "if (response.success && response.data?.id) {",
+                  "    pm.environment.set(\"warehouseId\", response.data.id);",
+                  "    console.log(\"Warehouse ID saved:\", response.data.id);",
+                  "} else {",
+                  "    console.log(\"Failed to save warehouse ID\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Warehouses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/warehouses",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "warehouses"]
+            },
+            "description": "Retrieve all warehouses from the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Warehouse By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/warehouses/{{warehouseId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "warehouses", "{{warehouseId}}"]
+            },
+            "description": "Retrieve a specific warehouse by their ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Warehouse",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Main Warehouse Updated\",\n  \"location\": \"Mumbai\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/warehouses/{{warehouseId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "warehouses", "{{warehouseId}}"]
+            },
+            "description": "Update an existing warehouse's information"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Warehouse",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/warehouses/{{warehouseId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "warehouses", "{{warehouseId}}"]
+            },
+            "description": "Delete a warehouse from the system"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

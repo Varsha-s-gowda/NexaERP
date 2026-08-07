@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "NexaERP - Stock Movement Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "movementId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Stock Movements",
+      "item": [
+        {
+          "name": "Create Stock IN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 50,\n  \"movementType\": \"IN\",\n  \"reason\": \"Initial Stock\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/stock-movements",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "stock-movements"]
+            },
+            "description": "Create a stock IN movement to increase product stock"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "",
+                  "if (response.success && response.data?.id) {",
+                  "    pm.environment.set(\"movementId\", response.data.id);",
+                  "    console.log(\"Movement ID saved:\", response.data.id);",
+                  "} else {",
+                  "    console.log(\"Failed to save movement ID\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Stock OUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 5,\n  \"movementType\": \"OUT\",\n  \"reason\": \"Sold to customer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/stock-movements",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "stock-movements"]
+            },
+            "description": "Create a stock OUT movement to decrease product stock"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Movements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/stock-movements",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "stock-movements"]
+            },
+            "description": "Retrieve all stock movements from the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Movement By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/stock-movements/{{movementId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "stock-movements", "{{movementId}}"]
+            },
+            "description": "Retrieve a specific stock movement by their ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/stock-movements/product/{{productId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "stock-movements", "product", "{{productId}}"]
+            },
+            "description": "Retrieve stock movement history for a specific product"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

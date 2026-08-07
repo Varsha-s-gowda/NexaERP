@@ -26,6 +26,11 @@ enum CustomerStatus {
   INACTIVE
 }
 
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+}
+
 enum MovementType {
   IN
   OUT
@@ -38,225 +43,189 @@ enum ChallanStatus {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  fullName   String
-  email      String   @unique
-  password   String
-  role       Role
-  isActive   Boolean  @default(true)
+  id       String  @id @default(uuid())
+  fullName String
+  email    String  @unique
+  password String
+  role     Role
+  isActive Boolean @default(true)
 
-  // Relations
-  customers        Customer[]         @relation("CustomerCreatedBy")
-  followUps        CustomerFollowUp[] @relation("FollowUpCreatedBy")
-  stockMovements   StockMovement[]    @relation("StockMovementCreatedBy")
-  salesChallans    SalesChallan[]     @relation("SalesChallanCreatedBy")
+  customers      Customer[]         @relation("CustomerCreatedBy")
+  followUps      CustomerFollowUp[] @relation("FollowUpCreatedBy")
+  stockMovements StockMovement[]    @relation("StockMovementCreatedBy")
+  salesChallans  SalesChallan[]     @relation("SalesChallanCreatedBy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([email])
   @@index([role])
 }
+
 model Customer {
-  id            String           @id @default(uuid())
-  customerCode  String           @unique
-  customerName  String
-  businessName  String
-  mobile        String
-  email         String?
-  gstNumber     String?
+  id           String  @id @default(uuid())
+  customerCode String  @unique
+  customerName String
+  businessName String
+  mobile       String
+  email        String?
+  gstNumber    String?
 
-  customerType  CustomerType
-  status        CustomerStatus   @default(LEAD)
+  customerType CustomerType
+  status       CustomerStatus @default(LEAD)
 
-  address       String
-  followUpDate  DateTime?
-  notes         String?
+  address      String
+  followUpDate DateTime?
+  notes        String?
 
-  createdBy     String
-  creator       User @relation(
-    "CustomerCreatedBy",
-    fields: [createdBy],
-    references: [id],
-    onDelete: Restrict
-  )
+  createdBy String
+  creator   User   @relation("CustomerCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
 
-  followUps     CustomerFollowUp[]
-  challans      SalesChallan[]
+  followUps CustomerFollowUp[]
+  challans  SalesChallan[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([customerName])
   @@index([businessName])
   @@index([mobile])
   @@index([status])
   @@index([customerType])
-  @@index([followUpDate])
 }
 
 model CustomerFollowUp {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  customerId    String
-  customer      Customer @relation(
-    fields: [customerId],
-    references: [id],
-    onDelete: Cascade
-  )
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  createdBy     String
-  creator       User @relation(
-    "FollowUpCreatedBy",
-    fields: [createdBy],
-    references: [id],
-    onDelete: Restrict
-  )
+  createdBy String
+  creator   User   @relation("FollowUpCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
 
-  notes         String
-  followUpDate  DateTime?
+  notes        String
+  followUpDate DateTime?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([customerId])
   @@index([followUpDate])
 }
+
 model Warehouse {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  location    String
-  isActive    Boolean  @default(true)
+  id String @id @default(uuid())
 
-  products    Product[]
+  name     String  @unique
+  location String
+  isActive Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([location])
 }
 
 model Product {
-  id                  String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  productName         String
-  sku                 String   @unique
-  category            String
+  productCode String @unique
+  productName String
 
-  unitPrice           Decimal  @db.Decimal(10,2)
+  category String
 
-  currentStock        Int      @default(0)
-  minimumStockAlert   Int      @default(10)
+  purchasePrice Decimal @db.Decimal(10, 2)
+  sellingPrice  Decimal @db.Decimal(10, 2)
 
-  warehouseId         String
-  warehouse           Warehouse @relation(
-    fields: [warehouseId],
-    references: [id],
-    onDelete: Restrict
-  )
+  gstPercentage Float @default(0)
 
-  stockMovements      StockMovement[]
-  challanItems        SalesChallanItem[]
+  stockQuantity Int @default(0)
+  minimumStock  Int @default(10)
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  description String?
+
+  status ProductStatus @default(ACTIVE)
+
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+
+  stockMovements StockMovement[]
+  challanItems   SalesChallanItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([productName])
+  @@index([productCode])
   @@index([category])
-  @@index([currentStock])
 }
 
 model StockMovement {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  productId     String
-  product        Product @relation(
-    fields: [productId],
-    references: [id],
-    onDelete: Restrict
-  )
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
-  quantity      Int
+  quantity     Int
+  movementType MovementType
+  reason       String
 
-  movementType  MovementType
+  createdBy String
+  creator   User   @relation("StockMovementCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
 
-  reason        String
-
-  createdBy     String
-  creator        User @relation(
-    "StockMovementCreatedBy",
-    fields: [createdBy],
-    references: [id],
-    onDelete: Restrict
-  )
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([productId])
   @@index([movementType])
-  @@index([createdAt])
 }
+
 model SalesChallan {
-  id              String          @id @default(uuid())
+  id String @id @default(uuid())
 
-  challanNumber   String          @unique
+  challanNumber String @unique
 
-  customerId      String
-  customer        Customer @relation(
-    fields: [customerId],
-    references: [id],
-    onDelete: Restrict
-  )
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
 
-  totalQuantity   Int
+  totalQuantity Int
 
-  status          ChallanStatus   @default(DRAFT)
+  totalAmount Decimal @db.Decimal(10, 2)
 
-  createdBy       String
-  creator         User @relation(
-    "SalesChallanCreatedBy",
-    fields: [createdBy],
-    references: [id],
-    onDelete: Restrict
-  )
+  status ChallanStatus @default(DRAFT)
 
-  items           SalesChallanItem[]
+  createdBy String
+  creator   User   @relation("SalesChallanCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  items SalesChallanItem[]
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([challanNumber])
   @@index([customerId])
-  @@index([status])
 }
 
 model SalesChallanItem {
-  id              String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  challanId       String
-  challan         SalesChallan @relation(
-    fields: [challanId],
-    references: [id],
-    onDelete: Cascade
-  )
+  challanId String
+  challan   SalesChallan @relation(fields: [challanId], references: [id], onDelete: Cascade)
 
-  productId       String
-  product         Product @relation(
-    fields: [productId],
-    references: [id],
-    onDelete: Restrict
-  )
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   // Product snapshot
-  productName     String
-  sku             String
-  unitPrice       Decimal @db.Decimal(10,2)
+  productCode  String
+  productName  String
+  sellingPrice Decimal @db.Decimal(10, 2)
 
-  quantity        Int
-  totalPrice      Decimal @db.Decimal(10,2)
+  quantity   Int
+  totalPrice Decimal @db.Decimal(10, 2)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([challanId])
   @@index([productId])

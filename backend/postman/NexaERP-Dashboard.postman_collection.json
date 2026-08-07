@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "NexaERP - Dashboard Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/dashboard/summary",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "dashboard", "summary"]
+            },
+            "description": "Retrieve dashboard summary including customers, products, warehouses, and sales metrics"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Low Stock",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/dashboard/low-stock",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "dashboard", "low-stock"]
+            },
+            "description": "Retrieve products with stock quantity at or below minimum stock level"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Monthly Sales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/dashboard/monthly-sales",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "dashboard", "monthly-sales"]
+            },
+            "description": "Retrieve monthly sales data grouped by month"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

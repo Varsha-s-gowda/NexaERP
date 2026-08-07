@@ -1,0 +1,159 @@
+{
+  "info": {
+    "name": "NexaERP - Customer Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerCode\": \"CUST001\",\n  \"customerName\": \"Rahul Sharma\",\n  \"businessName\": \"Sharma Traders\",\n  \"mobile\": \"9876543210\",\n  \"email\": \"rahul@example.com\",\n  \"gstNumber\": \"29ABCDE1234F1Z5\",\n  \"customerType\": \"WHOLESALE\",\n  \"address\": \"MG Road, Bangalore\",\n  \"followUpDate\": \"2026-08-15\",\n  \"notes\": \"Potential wholesale customer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/customers",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "customers"]
+            },
+            "description": "Create a new customer in the system"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "",
+                  "if (response.success && response.data?.id) {",
+                  "    pm.environment.set(\"customerId\", response.data.id);",
+                  "    console.log(\"Customer ID saved:\", response.data.id);",
+                  "} else {",
+                  "    console.log(\"Failed to save customer ID\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/customers",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "customers"]
+            },
+            "description": "Retrieve all customers from the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/customers/{{customerId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "customers", "{{customerId}}"]
+            },
+            "description": "Retrieve a specific customer by their ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Rahul Sharma Updated\",\n  \"businessName\": \"Sharma Traders Pvt Ltd\",\n  \"mobile\": \"9999999999\",\n  \"email\": \"rahul.updated@example.com\",\n  \"customerType\": \"DISTRIBUTOR\",\n  \"address\": \"Indiranagar, Bangalore\",\n  \"notes\": \"Updated customer information\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/customers/{{customerId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "customers", "{{customerId}}"]
+            },
+            "description": "Update an existing customer's information"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/customers/{{customerId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "customers", "{{customerId}}"]
+            },
+            "description": "Delete a customer from the system"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

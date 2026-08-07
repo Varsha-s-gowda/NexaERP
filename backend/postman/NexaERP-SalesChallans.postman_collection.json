@@ -1,0 +1,155 @@
+{
+  "info": {
+    "name": "NexaERP - Sales Challan Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "challanId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Sales Challans",
+      "item": [
+        {
+          "name": "Create Challan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"quantity\": 2\n    },\n    {\n      \"productId\": \"{{productId2}}\",\n      \"quantity\": 5\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/sales-challans",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "sales-challans"]
+            },
+            "description": "Create a new sales challan with items"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "",
+                  "if (response.success && response.data?.id) {",
+                  "    pm.environment.set(\"challanId\", response.data.id);",
+                  "    console.log(\"Challan ID saved:\", response.data.id);",
+                  "} else {",
+                  "    console.log(\"Failed to save challan ID\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Challans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/sales-challans",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "sales-challans"]
+            },
+            "description": "Retrieve all sales challans from the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Challan By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURL}}/api/sales-challans/{{challanId}}",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "sales-challans", "{{challanId}}"]
+            },
+            "description": "Retrieve a specific sales challan by their ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseURL}}/api/sales-challans/{{challanId}}/status",
+              "host": ["{{baseURL}}"],
+              "path": ["api", "sales-challans", "{{challanId}}", "status"]
+            },
+            "description": "Update the status of a sales challan (DRAFT, CONFIRMED, CANCELLED)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
