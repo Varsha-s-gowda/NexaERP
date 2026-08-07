@@ -1,0 +1,263 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SALES
+  WAREHOUSE
+  ACCOUNTS
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+  DISTRIBUTOR
+}
+
+enum CustomerStatus {
+  LEAD
+  ACTIVE
+  INACTIVE
+}
+
+enum MovementType {
+  IN
+  OUT
+}
+
+enum ChallanStatus {
+  DRAFT
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id         String   @id @default(uuid())
+  fullName   String
+  email      String   @unique
+  password   String
+  role       Role
+  isActive   Boolean  @default(true)
+
+  // Relations
+  customers        Customer[]         @relation("CustomerCreatedBy")
+  followUps        CustomerFollowUp[] @relation("FollowUpCreatedBy")
+  stockMovements   StockMovement[]    @relation("StockMovementCreatedBy")
+  salesChallans    SalesChallan[]     @relation("SalesChallanCreatedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+model Customer {
+  id            String           @id @default(uuid())
+  customerCode  String           @unique
+  customerName  String
+  businessName  String
+  mobile        String
+  email         String?
+  gstNumber     String?
+
+  customerType  CustomerType
+  status        CustomerStatus   @default(LEAD)
+
+  address       String
+  followUpDate  DateTime?
+  notes         String?
+
+  createdBy     String
+  creator       User @relation(
+    "CustomerCreatedBy",
+    fields: [createdBy],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  followUps     CustomerFollowUp[]
+  challans      SalesChallan[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([customerName])
+  @@index([businessName])
+  @@index([mobile])
+  @@index([status])
+  @@index([customerType])
+  @@index([followUpDate])
+}
+
+model CustomerFollowUp {
+  id            String   @id @default(uuid())
+
+  customerId    String
+  customer      Customer @relation(
+    fields: [customerId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  createdBy     String
+  creator       User @relation(
+    "FollowUpCreatedBy",
+    fields: [createdBy],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  notes         String
+  followUpDate  DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([followUpDate])
+}
+model Warehouse {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  location    String
+  isActive    Boolean  @default(true)
+
+  products    Product[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([location])
+}
+
+model Product {
+  id                  String   @id @default(uuid())
+
+  productName         String
+  sku                 String   @unique
+  category            String
+
+  unitPrice           Decimal  @db.Decimal(10,2)
+
+  currentStock        Int      @default(0)
+  minimumStockAlert   Int      @default(10)
+
+  warehouseId         String
+  warehouse           Warehouse @relation(
+    fields: [warehouseId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  stockMovements      StockMovement[]
+  challanItems        SalesChallanItem[]
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([productName])
+  @@index([category])
+  @@index([currentStock])
+}
+
+model StockMovement {
+  id            String   @id @default(uuid())
+
+  productId     String
+  product        Product @relation(
+    fields: [productId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  quantity      Int
+
+  movementType  MovementType
+
+  reason        String
+
+  createdBy     String
+  creator        User @relation(
+    "StockMovementCreatedBy",
+    fields: [createdBy],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([productId])
+  @@index([movementType])
+  @@index([createdAt])
+}
+model SalesChallan {
+  id              String          @id @default(uuid())
+
+  challanNumber   String          @unique
+
+  customerId      String
+  customer        Customer @relation(
+    fields: [customerId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  totalQuantity   Int
+
+  status          ChallanStatus   @default(DRAFT)
+
+  createdBy       String
+  creator         User @relation(
+    "SalesChallanCreatedBy",
+    fields: [createdBy],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  items           SalesChallanItem[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model SalesChallanItem {
+  id              String   @id @default(uuid())
+
+  challanId       String
+  challan         SalesChallan @relation(
+    fields: [challanId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  productId       String
+  product         Product @relation(
+    fields: [productId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  // Product snapshot
+  productName     String
+  sku             String
+  unitPrice       Decimal @db.Decimal(10,2)
+
+  quantity        Int
+  totalPrice      Decimal @db.Decimal(10,2)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([challanId])
+  @@index([productId])
+}
