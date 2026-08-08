@@ -23,6 +23,9 @@ import { swaggerSpec } from "./config/swagger.js";
 
 const app: Application = express();
 
+// Trust Render's proxy for rate limiting
+app.set("trust proxy", 1);
+
 // Environment variables
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const NODE_ENV = process.env.NODE_ENV || "development";
