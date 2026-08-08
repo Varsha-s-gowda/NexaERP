@@ -76,7 +76,7 @@ const warehouseController = new WarehouseController(warehouseService);
 router.post(
   "/",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
+  authorizeRoles(Role.ADMIN),
   createWarehouseValidator,
   validate,
   warehouseController.create.bind(warehouseController)
@@ -119,6 +119,7 @@ router.post(
 router.get(
   "/",
   authenticate,
+  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
   warehouseController.getAll.bind(warehouseController)
 );
 
@@ -231,7 +232,7 @@ router.get(
 router.put(
   "/:id",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
+  authorizeRoles(Role.ADMIN),
   updateWarehouseValidator,
   validate,
   warehouseController.update.bind(warehouseController)
@@ -280,7 +281,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
+  authorizeRoles(Role.ADMIN),
   warehouseController.delete.bind(warehouseController)
 );
 

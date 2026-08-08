@@ -128,6 +128,14 @@ export class DashboardService {
       });
     } else if (userRole === Role.ACCOUNTS) {
       Object.assign(summary, {
+        totalCustomers,
+        activeCustomers,
+        leadCustomers,
+        inactiveCustomers,
+        totalProducts,
+        activeProducts,
+        lowStockProducts: lowStockProducts.length,
+        outofStockProducts,
         totalSales,
         draftSales,
         confirmedSales,

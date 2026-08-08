@@ -7,6 +7,7 @@ import api from '../lib/api';
 import Sidebar from '../components/dashboard/Sidebar';
 import Navbar from '../components/dashboard/Navbar';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import {
   Search,
   Plus,
@@ -88,6 +89,8 @@ interface ProductsResponse {
 export default function Products() {
   const queryClient = useQueryClient();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useAuth();
+  const role = user?.role;
   
   // Search and filter state
   const [search, setSearch] = useState('');
@@ -537,15 +540,17 @@ export default function Products() {
                               >
                                 <Edit className="h-4 w-4" />
                               </button>
-                              <button
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setShowDeleteModal(true);
-                                }}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
+                              {role === 'ADMIN' && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedProduct(product);
+                                    setShowDeleteModal(true);
+                                  }}
+                                  className="text-red-600 hover:text-red-800"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -867,8 +872,9 @@ export default function Products() {
                   <input
                     type="number"
                     step="0.01"
+                    readOnly={role === 'WAREHOUSE'}
                     {...registerEdit('purchasePrice', { valueAsNumber: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a2e] focus:border-transparent outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a2e] focus:border-transparent outline-none read-only:bg-gray-100 read-only:text-gray-500"
                     placeholder="0.00"
                   />
                   {editErrors.purchasePrice && (
@@ -882,8 +888,9 @@ export default function Products() {
                   <input
                     type="number"
                     step="0.01"
+                    readOnly={role === 'WAREHOUSE'}
                     {...registerEdit('sellingPrice', { valueAsNumber: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a2e] focus:border-transparent outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a2e] focus:border-transparent outline-none read-only:bg-gray-100 read-only:text-gray-500"
                     placeholder="0.00"
                   />
                   {editErrors.sellingPrice && (

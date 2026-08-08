@@ -94,10 +94,7 @@ export class SalesChallanService {
   }
 
   async getAll(userId: string, userRole: Role, page: number = 1, limit: number = 10, search?: string, status?: string, customerId?: string, startDate?: string, endDate?: string): Promise<{ challans: SalesChallanResponse[], total: number }> {
-    if (userRole === Role.ADMIN || userRole === Role.ACCOUNTS) {
-      return await this.salesChallanRepository.findAll(undefined, page, limit, search, status, customerId, startDate, endDate);
-    }
-    return await this.salesChallanRepository.findAll(userId, page, limit, search, status, customerId, startDate, endDate);
+    return await this.salesChallanRepository.findAll(undefined, page, limit, search, status, customerId, startDate, endDate);
   }
 
   async getById(id: string, userId: string, userRole: Role): Promise<SalesChallanResponse> {
@@ -107,13 +104,6 @@ export class SalesChallanService {
       throw new ApiError(
         HTTP_STATUS.NOT_FOUND,
         "Sales challan not found"
-      );
-    }
-
-    if (userRole === Role.SALES && challan.createdBy !== userId) {
-      throw new ApiError(
-        HTTP_STATUS.FORBIDDEN,
-        "Access denied"
       );
     }
 

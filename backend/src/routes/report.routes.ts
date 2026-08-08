@@ -74,7 +74,7 @@ const reportController = new ReportController(reportService);
 router.get(
   "/sales",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.WAREHOUSE, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.SALES, Role.ACCOUNTS),
   reportController.salesReport.bind(reportController)
 );
 
@@ -113,7 +113,7 @@ router.get(
 router.get(
   "/inventory",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.WAREHOUSE, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
   reportController.inventoryReport.bind(reportController)
 );
 
@@ -152,7 +152,7 @@ router.get(
 router.get(
   "/customers",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.WAREHOUSE, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.SALES),
   reportController.customerReport.bind(reportController)
 );
 
@@ -191,7 +191,7 @@ router.get(
 router.get(
   "/products",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.WAREHOUSE, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
   reportController.productReport.bind(reportController)
 );
 
@@ -236,7 +236,7 @@ router.get(
 router.get(
   "/top-selling",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.WAREHOUSE, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
   reportController.topSellingProducts.bind(reportController)
 );
 

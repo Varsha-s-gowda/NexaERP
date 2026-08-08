@@ -85,7 +85,7 @@ const salesChallanController = new SalesChallanController(salesChallanService);
 router.post(
   "/",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.SALES),
   createSalesChallanValidator,
   validate,
   salesChallanController.create.bind(salesChallanController)
@@ -235,7 +235,7 @@ router.get(
 router.patch(
   "/:id/status",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN),
   updateChallanStatusValidator,
   validate,
   salesChallanController.updateStatus.bind(salesChallanController)

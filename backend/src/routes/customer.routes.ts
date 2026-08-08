@@ -437,7 +437,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.SALES, Role.ACCOUNTS),
+  authorizeRoles(Role.ADMIN, Role.ACCOUNTS),
   customerController.delete.bind(customerController)
 );
 

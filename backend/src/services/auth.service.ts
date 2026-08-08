@@ -73,10 +73,15 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(data.password);
 
+    const role = data.role && ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'].includes(data.role)
+      ? data.role
+      : 'SALES';
+
     const user = await this.authRepository.create(
       data.email,
       data.fullName,
-      hashedPassword
+      hashedPassword,
+      role
     );
 
     const response: RegisterResponse = {
@@ -89,5 +94,33 @@ export class AuthService {
     };
 
     return response;
+  }
+
+  async listUsers() {
+    return await this.authRepository.findAll();
+  }
+
+  async updateUser(id: string, data: any) {
+    // allow updating fullName, role, isActive, and password
+    const updateData: any = {};
+    if (data.fullName) updateData.fullName = data.fullName;
+    if (data.role && ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'].includes(data.role)) updateData.role = data.role;
+    if (typeof data.isActive === 'boolean') updateData.isActive = data.isActive;
+    if (data.password) {
+      updateData.password = await hashPassword(data.password);
+    }
+
+    const user = await this.authRepository.update(id, updateData);
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+    };
+  }
+
+  async deleteUser(id: string) {
+    await this.authRepository.delete(id);
   }
 }

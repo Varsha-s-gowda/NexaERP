@@ -50,4 +50,46 @@ export class AuthController {
       next(error);
     }
   }
+
+  async listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this.authService.listUsers();
+
+      res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, 'Users retrieved successfully', result)
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
+  async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = String(req.params.id);
+      const data = req.body;
+
+      const result = await this.authService.updateUser(id, data);
+
+      res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, 'User updated successfully', result)
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = String(req.params.id);
+
+      await this.authService.deleteUser(id);
+
+      res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, 'User deleted successfully', null)
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
 }

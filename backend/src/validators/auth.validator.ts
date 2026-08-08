@@ -13,6 +13,10 @@ export const loginValidator = [
     .withMessage("Password is required")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
+  body('role')
+    .optional()
+    .isIn(['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'])
+    .withMessage('Invalid role'),
 ];
 
 export const registerValidator = [
@@ -35,4 +39,8 @@ export const registerValidator = [
     .withMessage("Password is required")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
+  body("role")
+    .optional()
+    .isIn(['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'])
+    .withMessage('Invalid role'),
 ];

@@ -24,7 +24,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  const menuItems = [
+  const allItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Users, label: 'Customers', path: '/customers' },
     { icon: Package, label: 'Products', path: '/products' },
@@ -34,9 +34,24 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     { icon: BarChart3, label: 'Reports', path: '/reports' },
   ];
 
-  const bottomItems = [
-    { icon: Settings, label: 'Settings', path: '/settings' },
-  ];
+  const role = user?.role;
+
+  // Role-based visibility
+  const visibleItems = allItems.filter((item) => {
+    if (role === 'ADMIN') return true;
+    if (role === 'SALES') {
+      return ['Dashboard', 'Customers', 'Sales Challans', 'Reports'].includes(item.label);
+    }
+    if (role === 'ACCOUNTS') {
+      return ['Dashboard', 'Customers', 'Sales Challans', 'Reports'].includes(item.label);
+    }
+    if (role === 'WAREHOUSE') {
+      return ['Dashboard', 'Products', 'Warehouses', 'Stock Movements', 'Reports'].includes(item.label);
+    }
+    return false;
+  });
+
+  const bottomItems = role === 'ADMIN' ? [{ icon: Settings, label: 'Settings', path: '/settings' }] : [];
 
   const handleLogout = () => {
     logout();
@@ -80,7 +95,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4">
             <ul className="space-y-1">
-              {menuItems.map((item) => (
+              {visibleItems.map((item) => (
                 <li key={item.path}>
                   <button
                     onClick={() => {

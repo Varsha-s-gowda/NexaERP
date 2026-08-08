@@ -417,13 +417,15 @@ export default function SalesChallans() {
               <h1 className="text-2xl font-bold text-gray-900">Sales Challans</h1>
               <p className="text-gray-600">Create, manage and track sales challans</p>
             </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 bg-[#1a1a2e] text-white px-4 py-2 rounded-lg hover:bg-[#16213e] transition-colors whitespace-nowrap"
-            >
-              <Plus className="h-5 w-5" />
-              Create Sales Challan
-            </button>
+            {user?.role !== 'ACCOUNTS' && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center gap-2 bg-[#1a1a2e] text-white px-4 py-2 rounded-lg hover:bg-[#16213e] transition-colors whitespace-nowrap"
+              >
+                <Plus className="h-5 w-5" />
+                Create Sales Challan
+              </button>
+            )}
           </div>
 
           {/* ── KPI Cards ── */}

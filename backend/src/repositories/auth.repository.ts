@@ -18,13 +18,13 @@ export class AuthRepository {
     return user;
   }
 
-  async create(email: string, fullName: string, hashedPassword: string) {
+  async create(email: string, fullName: string, hashedPassword: string, role: string = 'SALES') {
     const user = await prisma.user.create({
       data: {
         email,
         fullName,
         password: hashedPassword,
-        role: "SALES",
+        role: role as any,
         isActive: true,
       },
       select: {
@@ -36,5 +36,40 @@ export class AuthRepository {
     });
 
     return user;
+  }
+
+  async findAll() {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
+    });
+
+    return users;
+  }
+
+  async update(id: string, data: any) {
+    const user = await prisma.user.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+        isActive: true,
+      },
+    });
+
+    return user;
+  }
+
+  async delete(id: string) {
+    await prisma.user.delete({ where: { id } });
   }
 }

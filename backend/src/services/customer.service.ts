@@ -36,13 +36,6 @@ export class CustomerService {
       );
     }
 
-    if (userRole !== Role.ADMIN && userRole !== Role.ACCOUNTS && customer.createdBy !== userId) {
-      throw new ApiError(
-        HTTP_STATUS.FORBIDDEN,
-        "Access denied"
-      );
-    }
-
     return customer;
   }
 
@@ -55,18 +48,8 @@ export class CustomerService {
     page: number = 1,
     limit: number = 10
   ): Promise<{ customers: CustomerResponse[]; total: number }> {
-    if (userRole === Role.ADMIN || userRole === Role.ACCOUNTS) {
-      return await this.customerRepository.findAll(
-        undefined,
-        search,
-        customerType,
-        status,
-        page,
-        limit
-      );
-    }
     return await this.customerRepository.findAll(
-      userId,
+      undefined,
       search,
       customerType,
       status,

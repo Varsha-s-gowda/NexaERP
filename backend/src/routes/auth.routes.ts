@@ -6,6 +6,9 @@ import { AuthRepository } from "../repositories/auth.repository.js";
 
 import { loginValidator, registerValidator } from "../validators/auth.validator.js";
 import { validate } from "../middleware/validate.middleware.js";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { authorizeRoles } from "../middleware/authorize.middleware.js";
+import { Role } from "@prisma/client";
 
 const router = Router();
 
@@ -149,9 +152,32 @@ router.post(
  */
 router.post(
   "/register",
+  authenticate,
+  authorizeRoles(Role.ADMIN),
   registerValidator,
   validate,
   authController.register.bind(authController)
+);
+
+router.get(
+  "/",
+  authenticate,
+  authorizeRoles(Role.ADMIN),
+  authController.listUsers.bind(authController)
+);
+
+router.patch(
+  "/:id",
+  authenticate,
+  authorizeRoles(Role.ADMIN),
+  authController.updateUser.bind(authController)
+);
+
+router.delete(
+  "/:id",
+  authenticate,
+  authorizeRoles(Role.ADMIN),
+  authController.deleteUser.bind(authController)
 );
 
 export default router;

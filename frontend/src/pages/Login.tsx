@@ -177,17 +177,7 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Signup link */}
-          <div className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <button
-              type="button"
-              onClick={() => navigate('/signup')}
-              className="text-[#1a1a2e] font-medium hover:underline"
-            >
-              Create one
-            </button>
-          </div>
+          {/* Public signup disabled - only ADMIN can create users */}
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">

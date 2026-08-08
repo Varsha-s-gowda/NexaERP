@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   BarChart3,
@@ -27,6 +27,7 @@ import {
 import api from '../lib/api';
 import Sidebar from '../components/dashboard/Sidebar';
 import Navbar from '../components/dashboard/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 import type {
   SalesReportResponse,
@@ -74,14 +75,28 @@ const getMonthLabel = (date: string) =>
   });
 
 export default function Reports() {
+  const { user } = useAuth();
+  const role = user?.role;
+
+  const defaultReportType = useMemo(() => {
+    if (role === 'WAREHOUSE') return 'inventory';
+    return 'sales';
+  }, [role]);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [reportType, setReportType] = useState<ReportType>('sales');
+  const [reportType, setReportType] = useState<ReportType>(defaultReportType);
   const [dateRange, setDateRange] = useState('this-month');
   const [warehouseId, setWarehouseId] = useState('');
   const [customerId, setCustomerId] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    if (role) {
+      setReportType(defaultReportType);
+    }
+  }, [role, defaultReportType]);
 
   const pageSize = 10;
 
@@ -108,6 +123,7 @@ export default function Reports() {
 
       return [];
     },
+    enabled: role === 'ADMIN' || role === 'SALES' || role === 'ACCOUNTS',
   });
 
   /*
@@ -125,6 +141,7 @@ export default function Reports() {
 
       return Array.isArray(data) ? data : [];
     },
+    enabled: role === 'ADMIN' || role === 'WAREHOUSE',
   });
 
   /*
@@ -358,11 +375,11 @@ export default function Reports() {
     topSellingLoading;
 
   const isError =
-    salesError ||
-    inventoryError ||
-    customerReportError ||
-    productReportError ||
-    topSellingError;
+    (reportType === 'sales' && salesError) ||
+    (reportType === 'inventory' && inventoryError) ||
+    (reportType === 'customers' && customerReportError) ||
+    (reportType === 'products' && productReportError) ||
+    (reportType === 'top-selling' && topSellingError);
 
   /*
    * ---------------------------------------------------------
@@ -454,7 +471,7 @@ export default function Reports() {
    */
 
   const handleReset = () => {
-    setReportType('sales');
+    setReportType(defaultReportType);
     setDateRange('this-month');
     setWarehouseId('');
     setCustomerId('');
@@ -724,19 +741,29 @@ export default function Reports() {
                   }}
                   className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
                 >
-                  <option value="sales">Sales Report</option>
-                  <option value="inventory">
-                    Inventory Report
-                  </option>
-                  <option value="customers">
-                    Customer Report
-                  </option>
-                  <option value="products">
-                    Product Report
-                  </option>
-                  <option value="top-selling">
-                    Top Selling Products
-                  </option>
+                  {(role === 'ADMIN' || role === 'SALES' || role === 'ACCOUNTS') && (
+                    <option value="sales">Sales Report</option>
+                  )}
+                  {(role === 'ADMIN' || role === 'WAREHOUSE') && (
+                    <option value="inventory">
+                      Inventory Report
+                    </option>
+                  )}
+                  {(role === 'ADMIN' || role === 'SALES') && (
+                    <option value="customers">
+                      Customer Report
+                    </option>
+                  )}
+                  {(role === 'ADMIN' || role === 'WAREHOUSE') && (
+                    <option value="products">
+                      Product Report
+                    </option>
+                  )}
+                  {(role === 'ADMIN' || role === 'WAREHOUSE') && (
+                    <option value="top-selling">
+                      Top Selling Products
+                    </option>
+                  )}
                 </select>
               </div>
 

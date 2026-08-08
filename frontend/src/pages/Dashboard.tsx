@@ -8,9 +8,12 @@ import KPICards from '../components/dashboard/KPICards';
 import LowStockTable from '../components/dashboard/LowStockTable';
 import SalesChart from '../components/dashboard/SalesChart';
 import RecentSales from '../components/dashboard/RecentSales';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useAuth();
+  const role = user?.role;
 
   // Fetch dashboard summary
   const { data: summary, isLoading: summaryLoading, error: summaryError, refetch: refetchSummary } = useQuery({
@@ -28,6 +31,7 @@ export default function Dashboard() {
       const response = await api.get<{ data: LowStockProduct[] }>('/dashboard/low-stock');
       return response.data.data;
     },
+    enabled: role === 'ADMIN' || role === 'WAREHOUSE',
   });
 
   // Fetch monthly sales
@@ -37,6 +41,7 @@ export default function Dashboard() {
       const response = await api.get<{ data: SalesSummary[] }>('/dashboard/monthly-sales');
       return response.data.data;
     },
+    enabled: role === 'ADMIN' || role === 'SALES' || role === 'ACCOUNTS',
   });
 
   // Fetch recent sales
@@ -46,6 +51,7 @@ export default function Dashboard() {
       const response = await api.get<{ data: SalesReport[] }>('/reports/sales');
       return response.data.data;
     },
+    enabled: role === 'ADMIN' || role === 'SALES' || role === 'ACCOUNTS',
   });
 
   const defaultSummary: DashboardSummary = {

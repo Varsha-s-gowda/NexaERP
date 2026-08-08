@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
 import Login from './pages/Login';
-import Signup from './pages/Signup';
+// Signup removed: no public registration
 import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import Products from './pages/Products';
@@ -41,16 +41,7 @@ function AppRoutes() {
         }
       />
 
-      <Route
-        path="/signup"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <Signup />
-          )
-        }
-      />
+      {/* Signup route removed to disable public registration */}
 
       <Route
         path="/dashboard"
@@ -64,7 +55,7 @@ function AppRoutes() {
       <Route
         path="/customers"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN","SALES","ACCOUNTS"]}>
             <Customers />
           </ProtectedRoute>
         }
@@ -73,7 +64,7 @@ function AppRoutes() {
       <Route
         path="/products"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN","WAREHOUSE"]}>
             <Products />
           </ProtectedRoute>
         }
@@ -82,7 +73,7 @@ function AppRoutes() {
       <Route
         path="/warehouses"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN","WAREHOUSE"]}>
             <Warehouses />
           </ProtectedRoute>
         }
@@ -91,7 +82,7 @@ function AppRoutes() {
       <Route
         path="/stock-movements"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN","WAREHOUSE"]}>
             <StockMovements />
           </ProtectedRoute>
         }
@@ -100,7 +91,7 @@ function AppRoutes() {
       <Route
         path="/sales-challans"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN","SALES","ACCOUNTS"]}>
             <SalesChallans />
           </ProtectedRoute>
         }
@@ -110,7 +101,7 @@ function AppRoutes() {
       <Route
         path="/reports"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN","SALES","WAREHOUSE","ACCOUNTS"]}>
             <Reports />
           </ProtectedRoute>
         }
@@ -119,7 +110,7 @@ function AppRoutes() {
       <Route
         path="/settings"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
             <Settings />
           </ProtectedRoute>
         }
