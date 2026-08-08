@@ -1,0 +1,36 @@
+services:
+  # Backend API Web Service
+  - type: web
+    name: nexa-erp-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install --production=false && npm run build && npx prisma generate
+    startCommand: npx prisma migrate deploy && npm run start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://nexa-erp-frontend.onrender.com
+
+  # Frontend React Static Site
+  - type: static
+    name: nexa-erp-frontend
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install --production=false && npm run build
+    publishDir: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://nexa-erp-backend.onrender.com/api
