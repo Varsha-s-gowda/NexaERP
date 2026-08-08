@@ -101,7 +101,7 @@ const createChallanSchema = z.object({
       z.object({
         productId: z.string().min(1, 'Please select a product'),
         quantity: z
-          .number({ invalid_type_error: 'Quantity is required' })
+          .number()
           .int()
           .min(1, 'Quantity must be at least 1'),
       })
@@ -282,7 +282,6 @@ export default function SalesChallans() {
     formState: { errors: createErrors },
     reset: resetCreate,
     setValue: setCreateValue,
-    watch: watchCreate,
   } = useForm<CreateChallanFormData>({
     resolver: zodResolver(createChallanSchema),
     defaultValues: {
