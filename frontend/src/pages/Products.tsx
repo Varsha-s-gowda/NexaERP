@@ -117,7 +117,7 @@ export default function Products() {
       params.append('limit', limit.toString());
       
       const response = await api.get(`/products?${params.toString()}`);
-      return response.data as ProductsResponse;
+      return response.data.data as ProductsResponse;
     },
   });
 

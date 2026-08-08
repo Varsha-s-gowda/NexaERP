@@ -51,7 +51,15 @@ export class SalesChallanController {
     try {
       const userId = (req as any).user?.userId;
       const userRole = (req as any).user?.role;
-      const result = await this.salesChallanService.getAll(userId, userRole);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const search = req.query.search as string;
+      const status = req.query.status as string;
+      const customerId = req.query.customerId as string;
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
+      
+      const result = await this.salesChallanService.getAll(userId, userRole, page, limit, search, status, customerId, startDate, endDate);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(

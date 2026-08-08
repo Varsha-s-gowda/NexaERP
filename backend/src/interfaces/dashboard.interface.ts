@@ -14,6 +14,7 @@ export interface DashboardSummaryResponse {
   stockOutMovements: number;
   transferMovements: number;
   totalSales: number;
+  draftSales: number;
   confirmedSales: number;
   cancelledSales: number;
   totalRevenue: number;

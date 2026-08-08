@@ -35,4 +35,6 @@ export interface SalesChallanResponse {
   items: SalesChallanItemResponse[];
   createdAt: string;
   updatedAt: string;
+  customerName: string;
+  businessName: string;
 }

@@ -54,12 +54,6 @@ export class SalesChallanService {
           throw new Error("Product not found");
         }
 
-        if (product.stockQuantity < item.quantity) {
-          throw new Error(
-            `Insufficient stock for product ${product.productName}. Available: ${product.stockQuantity}, Requested: ${item.quantity}`
-          );
-        }
-
         const totalPrice = Number(product.sellingPrice) * item.quantity;
 
         challanItems.push({
@@ -73,13 +67,6 @@ export class SalesChallanService {
 
         totalQuantity += item.quantity;
         totalAmount += totalPrice;
-
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stockQuantity: product.stockQuantity - item.quantity,
-          },
-        });
       }
 
       const challan = await tx.salesChallan.create({
@@ -96,24 +83,21 @@ export class SalesChallanService {
         },
         include: {
           items: true,
+          customer: true,
         },
       });
 
       return challan;
     });
 
-    const challan = await this.salesChallanRepository.findById(result.id);
-    if (!challan) {
-      throw new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR, "Failed to create sales challan");
-    }
-    return challan;
+    return this.salesChallanRepository.formatResponse(result);
   }
 
-  async getAll(userId: string, userRole: Role): Promise<SalesChallanResponse[]> {
+  async getAll(userId: string, userRole: Role, page: number = 1, limit: number = 10, search?: string, status?: string, customerId?: string, startDate?: string, endDate?: string): Promise<{ challans: SalesChallanResponse[], total: number }> {
     if (userRole === Role.ADMIN || userRole === Role.ACCOUNTS) {
-      return await this.salesChallanRepository.findAll();
+      return await this.salesChallanRepository.findAll(undefined, page, limit, search, status, customerId, startDate, endDate);
     }
-    return await this.salesChallanRepository.findAll(userId);
+    return await this.salesChallanRepository.findAll(userId, page, limit, search, status, customerId, startDate, endDate);
   }
 
   async getById(id: string, userId: string, userRole: Role): Promise<SalesChallanResponse> {
@@ -160,11 +144,53 @@ export class SalesChallanService {
       );
     }
 
+    if (data.status === "CONFIRMED" && challan.status === "DRAFT") {
+      await this.deductStock(id);
+    }
+
     if (data.status === "CANCELLED" && challan.status !== "CANCELLED") {
       await this.restoreStock(id);
     }
 
     return await this.salesChallanRepository.updateStatus(id, data.status);
+  }
+
+  private async deductStock(challanId: string): Promise<void> {
+    await prisma.$transaction(async (tx: any) => {
+      const challan = await tx.salesChallan.findUnique({
+        where: { id: challanId },
+        include: {
+          items: true,
+        },
+      });
+
+      if (!challan) {
+        throw new Error("Challan not found");
+      }
+
+      for (const item of challan.items) {
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
+        });
+
+        if (!product) {
+          throw new Error("Product not found");
+        }
+
+        if (product.stockQuantity < item.quantity) {
+          throw new Error(
+            `Insufficient stock for product ${product.productName}. Available: ${product.stockQuantity}, Requested: ${item.quantity}`
+          );
+        }
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stockQuantity: product.stockQuantity - item.quantity,
+          },
+        });
+      }
+    });
   }
 
   private async restoreStock(challanId: string): Promise<void> {

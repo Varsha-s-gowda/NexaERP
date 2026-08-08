@@ -1,10 +1,20 @@
 export interface DashboardSummary {
   totalCustomers: number;
   activeCustomers: number;
+  leadCustomers: number;
+  inactiveCustomers: number;
   totalProducts: number;
+  activeProducts: number;
   lowStockProducts: number;
+  outofStockProducts: number;
   totalWarehouses: number;
+  activeWarehouses: number;
+  totalStockMovements: number;
+  stockInMovements: number;
+  stockOutMovements: number;
+  transferMovements: number;
   totalSales: number;
+  draftSales: number;
   confirmedSales: number;
   cancelledSales: number;
   totalRevenue: number;

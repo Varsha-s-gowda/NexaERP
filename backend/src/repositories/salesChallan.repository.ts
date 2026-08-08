@@ -10,6 +10,7 @@ export class SalesChallanRepository {
       },
       include: {
         items: true,
+        customer: true,
       },
     });
 
@@ -21,23 +22,60 @@ export class SalesChallanRepository {
       where: { id },
       include: {
         items: true,
+        customer: true,
       },
     });
 
     return challan ? this.formatResponse(challan) : null;
   }
 
-  async findAll(createdBy?: string): Promise<SalesChallanResponse[]> {
-    const where = createdBy ? { createdBy } : {};
-    const challans = await prisma.salesChallan.findMany({
-      where,
-      include: {
-        items: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+  async findAll(createdBy?: string, page: number = 1, limit: number = 10, search?: string, status?: string, customerId?: string, startDate?: string, endDate?: string): Promise<{ challans: SalesChallanResponse[], total: number }> {
+    const where: any = createdBy ? { createdBy } : {};
+    
+    if (search) {
+      where.OR = [
+        { challanNumber: { contains: search, mode: 'insensitive' } },
+        { customer: { customerName: { contains: search, mode: 'insensitive' } } },
+        { customer: { businessName: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+    
+    if (status) {
+      where.status = status;
+    }
+    
+    if (customerId) {
+      where.customerId = customerId;
+    }
+    
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) {
+        where.createdAt.gte = new Date(startDate);
+      }
+      if (endDate) {
+        where.createdAt.lte = new Date(endDate);
+      }
+    }
+    
+    const [challans, total] = await Promise.all([
+      prisma.salesChallan.findMany({
+        where,
+        include: {
+          items: true,
+          customer: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.salesChallan.count({ where }),
+    ]);
 
-    return challans.map((challan) => this.formatResponse(challan));
+    return {
+      challans: challans.map((challan) => this.formatResponse(challan)),
+      total,
+    };
   }
 
   async updateStatus(id: string, status: string): Promise<SalesChallanResponse> {
@@ -46,6 +84,7 @@ export class SalesChallanRepository {
       data: { status: status as any },
       include: {
         items: true,
+        customer: true,
       },
     });
 
@@ -85,7 +124,7 @@ export class SalesChallanRepository {
     return product;
   }
 
-  private formatResponse(challan: any): SalesChallanResponse {
+  formatResponse(challan: any): SalesChallanResponse {
     return {
       id: challan.id,
       challanNumber: challan.challanNumber,
@@ -97,6 +136,8 @@ export class SalesChallanRepository {
       items: challan.items.map((item: any) => this.formatItemResponse(item)),
       createdAt: challan.createdAt.toISOString(),
       updatedAt: challan.updatedAt.toISOString(),
+      customerName: challan.customer?.customerName || '',
+      businessName: challan.customer?.businessName || '',
     };
   }
 

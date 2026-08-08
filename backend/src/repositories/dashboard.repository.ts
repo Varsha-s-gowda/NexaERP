@@ -108,6 +108,12 @@ export class DashboardRepository {
     return await prisma.salesChallan.count();
   }
 
+  async getDraftSalesChallans(): Promise<number> {
+    return await prisma.salesChallan.count({
+      where: { status: "DRAFT" },
+    });
+  }
+
   async getConfirmedSales(): Promise<number> {
     return await prisma.salesChallan.count({
       where: { status: "CONFIRMED" },

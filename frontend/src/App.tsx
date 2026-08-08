@@ -9,6 +9,7 @@ import Customers from './pages/Customers';
 import Products from './pages/Products';
 import Warehouses from './pages/Warehouses';
 import StockMovements from './pages/StockMovements';
+import SalesChallans from './pages/SalesChallans';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const queryClient = new QueryClient({
@@ -70,6 +71,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <StockMovements />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/sales-challans"
+        element={
+          <ProtectedRoute>
+            <SalesChallans />
           </ProtectedRoute>
         }
       />

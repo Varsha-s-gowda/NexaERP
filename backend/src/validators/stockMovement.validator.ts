@@ -20,18 +20,21 @@ export const createStockMovementValidator = [
     .withMessage("Movement type must be IN, OUT, or TRANSFER"),
 
   body("reason")
-    .optional()
+    .optional({ nullable: true })
     .trim()
+    .if((value) => value !== undefined && value !== null && value !== "")
     .isLength({ min: 2, max: 500 })
     .withMessage("Reason must be between 2 and 500 characters"),
 
   body("fromWarehouseId")
-    .optional()
+    .optional({ nullable: true })
+    .if((value) => value !== undefined && value !== null && value !== "")
     .isUUID()
     .withMessage("Invalid from warehouse ID format"),
 
   body("toWarehouseId")
-    .optional()
+    .optional({ nullable: true })
+    .if((value) => value !== undefined && value !== null && value !== "")
     .isUUID()
     .withMessage("Invalid to warehouse ID format"),
 ];
