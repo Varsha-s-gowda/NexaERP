@@ -77,7 +77,7 @@ export class StockMovementRepository {
     return !!product;
   }
 
-  async getProductStock(productId: string): Promise<number> {
+  async getProductStock(productId: string, warehouseId?: string): Promise<number> {
     const product = await prisma.product.findUnique({
       where: { id: productId },
       select: { stockQuantity: true },
@@ -92,7 +92,10 @@ export class StockMovementRepository {
       productId: movement.productId,
       quantity: movement.quantity,
       movementType: movement.movementType,
+      status: movement.status,
       reason: movement.reason,
+      fromWarehouseId: movement.fromWarehouseId,
+      toWarehouseId: movement.toWarehouseId,
       createdBy: movement.createdBy,
       createdAt: movement.createdAt.toISOString(),
       updatedAt: movement.updatedAt.toISOString(),

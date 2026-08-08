@@ -35,12 +35,6 @@ export const createCustomerValidator = [
     .isEmail()
     .withMessage("Invalid email format"),
 
-  body("gstNumber")
-    .optional()
-    .trim()
-    .isLength({ min: 15, max: 15 })
-    .withMessage("GST number must be 15 characters"),
-
   body("customerType")
     .notEmpty()
     .withMessage("Customer type is required")
@@ -90,12 +84,6 @@ export const updateCustomerValidator = [
     .trim()
     .isEmail()
     .withMessage("Invalid email format"),
-
-  body("gstNumber")
-    .optional()
-    .trim()
-    .isLength({ min: 15, max: 15 })
-    .withMessage("GST number must be 15 characters"),
 
   body("customerType")
     .optional()

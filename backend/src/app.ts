@@ -11,6 +11,7 @@ import rateLimit from "express-rate-limit";
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
+import followUpRoutes from "./routes/followup.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import warehouseRoutes from "./routes/warehouse.routes.js";
 import stockMovementRoutes from "./routes/stockMovement.routes.js";
@@ -30,9 +31,13 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 app.use(helmet());
 
 // CORS Configuration
+const corsOrigins = NODE_ENV === 'development' 
+  ? ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:3000']
+  : [FRONTEND_URL];
+
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: corsOrigins,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true,
@@ -74,6 +79,7 @@ app.use("/api", healthRoutes);
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/customers", customerRoutes);
+app.use("/api/customers", followUpRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/warehouses", warehouseRoutes);
 app.use("/api/stock-movements", stockMovementRoutes);

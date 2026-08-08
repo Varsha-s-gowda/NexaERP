@@ -15,8 +15,32 @@ export class DashboardRepository {
     });
   }
 
+  async getLeadCustomers(): Promise<number> {
+    return await prisma.customer.count({
+      where: { status: "LEAD" },
+    });
+  }
+
+  async getInactiveCustomers(): Promise<number> {
+    return await prisma.customer.count({
+      where: { status: "INACTIVE" },
+    });
+  }
+
   async getTotalProducts(): Promise<number> {
     return await prisma.product.count();
+  }
+
+  async getActiveProducts(): Promise<number> {
+    return await prisma.product.count({
+      where: { status: "ACTIVE" },
+    });
+  }
+
+  async getOutofStockProducts(): Promise<number> {
+    return await prisma.product.count({
+      where: { stockQuantity: 0 },
+    });
   }
 
   async getLowStockProducts(): Promise<LowStockProductResponse[]> {
@@ -50,6 +74,34 @@ export class DashboardRepository {
 
   async getTotalWarehouses(): Promise<number> {
     return await prisma.warehouse.count();
+  }
+
+  async getActiveWarehouses(): Promise<number> {
+    return await prisma.warehouse.count({
+      where: { isActive: true },
+    });
+  }
+
+  async getTotalStockMovements(): Promise<number> {
+    return await prisma.stockMovement.count();
+  }
+
+  async getStockInMovements(): Promise<number> {
+    return await prisma.stockMovement.count({
+      where: { movementType: "IN" },
+    });
+  }
+
+  async getStockOutMovements(): Promise<number> {
+    return await prisma.stockMovement.count({
+      where: { movementType: "OUT" },
+    });
+  }
+
+  async getTransferMovements(): Promise<number> {
+    return await prisma.stockMovement.count({
+      where: { movementType: "TRANSFER" },
+    });
   }
 
   async getTotalSalesChallans(): Promise<number> {

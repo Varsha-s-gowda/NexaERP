@@ -5,13 +5,13 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { HTTP_STATUS } from "../constants/httpStatus.js";
 
 import type {
-  CreateCustomerRequest,
-  UpdateCustomerRequest,
-} from "../interfaces/customer.interface.js";
-import type { CustomerService } from "../services/customer.service.js";
+  CreateFollowUpRequest,
+  UpdateFollowUpRequest,
+} from "../interfaces/followup.interface.js";
+import type { FollowUpService } from "../services/followup.service.js";
 
-export class CustomerController {
-  constructor(private readonly customerService: CustomerService) {}
+export class FollowUpController {
+  constructor(private readonly followUpService: FollowUpService) {}
 
   async create(
     req: Request,
@@ -19,7 +19,7 @@ export class CustomerController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const data: CreateCustomerRequest = req.body;
+      const data: CreateFollowUpRequest = req.body;
       const createdBy = (req as any).user?.userId;
 
       if (!createdBy) {
@@ -29,12 +29,12 @@ export class CustomerController {
         );
       }
 
-      const result = await this.customerService.create(data, createdBy);
+      const result = await this.followUpService.create(data, createdBy);
 
       res.status(HTTP_STATUS.CREATED).json(
         new ApiResponse(
           HTTP_STATUS.CREATED,
-          "Customer created successfully",
+          "Follow-up created successfully",
           result
         )
       );
@@ -50,22 +50,28 @@ export class CustomerController {
   ): Promise<void> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.userId;
-      const userRole = (req as any).user?.role;
 
       if (!id) {
         throw new ApiError(
           HTTP_STATUS.BAD_REQUEST,
-          "Customer ID is required"
+          "Follow-up ID is required"
         );
       }
 
-      const result = await this.customerService.getById(id as string, userId, userRole);
+      const idString = Array.isArray(id) ? id[0] : id;
+      if (!idString) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Follow-up ID is required"
+        );
+      }
+
+      const result = await this.followUpService.getById(idString);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(
           HTTP_STATUS.OK,
-          "Customer retrieved successfully",
+          "Follow-up retrieved successfully",
           result
         )
       );
@@ -74,30 +80,35 @@ export class CustomerController {
     }
   }
 
-  async getAll(
+  async getByCustomerId(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = (req as any).user?.userId;
-      const userRole = (req as any).user?.role;
-      const { search, customerType, status, page, limit } = req.query;
+      const { customerId } = req.params;
 
-      const result = await this.customerService.getAll(
-        userId,
-        userRole,
-        search as string,
-        customerType as string,
-        status as string,
-        page ? parseInt(page as string) : 1,
-        limit ? parseInt(limit as string) : 10
-      );
+      if (!customerId) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Customer ID is required"
+        );
+      }
+
+      const customerIdString = Array.isArray(customerId) ? customerId[0] : customerId;
+      if (!customerIdString) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Customer ID is required"
+        );
+      }
+
+      const result = await this.followUpService.getByCustomerId(customerIdString);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(
           HTTP_STATUS.OK,
-          "Customers retrieved successfully",
+          "Follow-ups retrieved successfully",
           result
         )
       );
@@ -117,25 +128,26 @@ export class CustomerController {
       if (!id) {
         throw new ApiError(
           HTTP_STATUS.BAD_REQUEST,
-          "Customer ID is required"
+          "Follow-up ID is required"
         );
       }
 
-      const data: UpdateCustomerRequest = req.body;
-      const userId = (req as any).user?.userId;
-      const userRole = (req as any).user?.role;
+      const idString = Array.isArray(id) ? id[0] : id;
+      if (!idString) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Follow-up ID is required"
+        );
+      }
 
-      const result = await this.customerService.update(
-        id as string,
-        data,
-        userId,
-        userRole
-      );
+      const data: UpdateFollowUpRequest = req.body;
+
+      const result = await this.followUpService.update(idString, data);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(
           HTTP_STATUS.OK,
-          "Customer updated successfully",
+          "Follow-up updated successfully",
           result
         )
       );
@@ -151,21 +163,28 @@ export class CustomerController {
   ): Promise<void> {
     try {
       const { id } = req.params;
-      const userRole = (req as any).user?.role;
 
       if (!id) {
         throw new ApiError(
           HTTP_STATUS.BAD_REQUEST,
-          "Customer ID is required"
+          "Follow-up ID is required"
         );
       }
 
-      await this.customerService.delete(id as string, userRole);
+      const idString = Array.isArray(id) ? id[0] : id;
+      if (!idString) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Follow-up ID is required"
+        );
+      }
+
+      await this.followUpService.delete(idString);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(
           HTTP_STATUS.OK,
-          "Customer deleted successfully"
+          "Follow-up deleted successfully"
         )
       );
     } catch (error) {

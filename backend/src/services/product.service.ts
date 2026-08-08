@@ -85,8 +85,15 @@ export class ProductService {
     return product;
   }
 
-  async getAll(): Promise<ProductResponse[]> {
-    return await this.productRepository.findAll();
+  async getAll(
+    search?: string,
+    category?: string,
+    status?: string,
+    warehouseId?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ products: ProductResponse[]; total: number }> {
+    return await this.productRepository.findAll(search, category, status, warehouseId, page, limit);
   }
 
   async update(id: string, data: UpdateProductRequest, userRole: Role): Promise<ProductResponse> {

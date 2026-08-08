@@ -57,7 +57,7 @@ export class WarehouseService {
     return warehouse;
   }
 
-  async getAll(userRole: Role): Promise<WarehouseResponse[]> {
+  async getAll(userRole?: Role): Promise<WarehouseResponse[]> {
     return await this.warehouseRepository.findAll();
   }
 

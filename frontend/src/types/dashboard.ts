@@ -1,18 +1,9 @@
-export interface DashboardSummaryResponse {
+export interface DashboardSummary {
   totalCustomers: number;
   activeCustomers: number;
-  leadCustomers: number;
-  inactiveCustomers: number;
   totalProducts: number;
-  activeProducts: number;
   lowStockProducts: number;
-  outofStockProducts: number;
   totalWarehouses: number;
-  activeWarehouses: number;
-  totalStockMovements: number;
-  stockInMovements: number;
-  stockOutMovements: number;
-  transferMovements: number;
   totalSales: number;
   confirmedSales: number;
   cancelledSales: number;
@@ -20,7 +11,7 @@ export interface DashboardSummaryResponse {
   todayRevenue: number;
 }
 
-export interface LowStockProductResponse {
+export interface LowStockProduct {
   id: string;
   productCode: string;
   productName: string;
@@ -30,16 +21,26 @@ export interface LowStockProductResponse {
   warehouseId: string;
 }
 
-export interface SalesSummaryResponse {
+export interface SalesSummary {
   month: string;
   totalSales: number;
   totalRevenue: number;
 }
 
-export interface CustomerSummaryResponse {
+export interface SalesReport {
   id: string;
+  challanNumber: string;
+  customerId: string;
   customerName: string;
-  businessName: string;
+  totalQuantity: number;
+  totalAmount: number;
   status: string;
-  totalChallans: number;
+  createdAt: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: T;
 }

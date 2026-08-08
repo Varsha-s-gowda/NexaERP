@@ -26,12 +26,50 @@ export class ProductRepository {
     return product ? this.formatResponse(product) : null;
   }
 
-  async findAll(): Promise<ProductResponse[]> {
-    const products = await prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+  async findAll(
+    search?: string,
+    category?: string,
+    status?: string,
+    warehouseId?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ products: ProductResponse[]; total: number }> {
+    const where: any = {};
 
-    return products.map((product) => this.formatResponse(product));
+    if (search) {
+      where.OR = [
+        { productCode: { contains: search, mode: 'insensitive' } },
+        { productName: { contains: search, mode: 'insensitive' } },
+        { category: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (category) {
+      where.category = category;
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (warehouseId) {
+      where.warehouseId = warehouseId;
+    }
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return {
+      products: products.map((product) => this.formatResponse(product)),
+      total,
+    };
   }
 
   async update(id: string, data: any): Promise<ProductResponse> {

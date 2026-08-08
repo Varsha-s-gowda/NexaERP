@@ -34,6 +34,13 @@ enum ProductStatus {
 enum MovementType {
   IN
   OUT
+  TRANSFER
+}
+
+enum MovementStatus {
+  COMPLETED
+  PENDING
+  CANCELLED
 }
 
 enum ChallanStatus {
@@ -120,6 +127,8 @@ model Warehouse {
   isActive Boolean @default(true)
 
   products Product[]
+  fromStockMovements StockMovement[] @relation("StockMovementFrom")
+  toStockMovements StockMovement[] @relation("StockMovementTo")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -169,7 +178,14 @@ model StockMovement {
 
   quantity     Int
   movementType MovementType
-  reason       String
+  status       MovementStatus @default(COMPLETED)
+  reason       String?
+
+  fromWarehouseId String?
+  fromWarehouse   Warehouse? @relation("StockMovementFrom", fields: [fromWarehouseId], references: [id], onDelete: Restrict)
+
+  toWarehouseId String?
+  toWarehouse   Warehouse? @relation("StockMovementTo", fields: [toWarehouseId], references: [id], onDelete: Restrict)
 
   createdBy String
   creator   User   @relation("StockMovementCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
@@ -179,6 +195,8 @@ model StockMovement {
 
   @@index([productId])
   @@index([movementType])
+  @@index([fromWarehouseId])
+  @@index([toWarehouseId])
 }
 
 model SalesChallan {

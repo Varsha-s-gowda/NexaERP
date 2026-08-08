@@ -25,7 +25,38 @@ export class StockMovementService {
       );
     }
 
-    if (data.movementType === "OUT") {
+    // Validate warehouse requirements based on movement type
+    if (data.movementType === "IN") {
+      if (!data.toWarehouseId) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Destination warehouse is required for STOCK IN"
+        );
+      }
+    } else if (data.movementType === "OUT") {
+      if (!data.fromWarehouseId) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Source warehouse is required for STOCK OUT"
+        );
+      }
+    } else if (data.movementType === "TRANSFER") {
+      if (!data.fromWarehouseId || !data.toWarehouseId) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Both source and destination warehouses are required for TRANSFER"
+        );
+      }
+      if (data.fromWarehouseId === data.toWarehouseId) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Source and destination warehouses cannot be the same"
+        );
+      }
+    }
+
+    // Check stock availability for OUT and TRANSFER
+    if (data.movementType === "OUT" || data.movementType === "TRANSFER") {
       const currentStock = await this.stockMovementRepository.getProductStock(
         data.productId
       );
@@ -44,30 +75,61 @@ export class StockMovementService {
           productId: data.productId,
           quantity: data.quantity,
           movementType: data.movementType,
-          reason: data.reason,
+          status: "COMPLETED",
+          reason: data.reason || null,
+          fromWarehouseId: data.fromWarehouseId || null,
+          toWarehouseId: data.toWarehouseId || null,
           createdBy,
         },
       });
 
-      const product = await tx.product.findUnique({
-        where: { id: data.productId },
-      });
-
-      if (!product) {
-        throw new Error("Product not found");
-      }
-
-      let newStock: number;
+      // Handle stock updates based on movement type
       if (data.movementType === "IN") {
-        newStock = product.stockQuantity + data.quantity;
-      } else {
-        newStock = product.stockQuantity - data.quantity;
-      }
+        // For STOCK IN, we need to find or create product in destination warehouse
+        // Since products have a single warehouseId in current schema, we update the main product
+        const product = await tx.product.findUnique({
+          where: { id: data.productId },
+        });
 
-      await tx.product.update({
-        where: { id: data.productId },
-        data: { stockQuantity: newStock },
-      });
+        if (!product) {
+          throw new Error("Product not found");
+        }
+
+        const newStock = product.stockQuantity + data.quantity;
+        await tx.product.update({
+          where: { id: data.productId },
+          data: { stockQuantity: newStock },
+        });
+      } else if (data.movementType === "OUT") {
+        const product = await tx.product.findUnique({
+          where: { id: data.productId },
+        });
+
+        if (!product) {
+          throw new Error("Product not found");
+        }
+
+        const newStock = product.stockQuantity - data.quantity;
+        await tx.product.update({
+          where: { id: data.productId },
+          data: { stockQuantity: newStock },
+        });
+      } else if (data.movementType === "TRANSFER") {
+        // TRANSFER: Decrease from source, increase to destination
+        // Since current schema has single warehouseId per product, we just update the main stock
+        // In a more complex schema, we'd track stock per warehouse
+        const product = await tx.product.findUnique({
+          where: { id: data.productId },
+        });
+
+        if (!product) {
+          throw new Error("Product not found");
+        }
+
+        // For TRANSFER, net stock change is 0 (just moving between warehouses)
+        // But we still record the movement
+        // In current schema, we don't track per-warehouse stock, so we just log the transfer
+      }
 
       return stockMovement;
     });

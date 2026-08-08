@@ -119,7 +119,6 @@ router.post(
 router.get(
   "/",
   authenticate,
-  authorizeRoles(Role.ADMIN, Role.WAREHOUSE),
   warehouseController.getAll.bind(warehouseController)
 );
 

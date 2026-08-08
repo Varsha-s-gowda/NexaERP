@@ -1,8 +1,10 @@
 export interface CreateStockMovementRequest {
   productId: string;
   quantity: number;
-  movementType: "IN" | "OUT";
-  reason: string;
+  movementType: "IN" | "OUT" | "TRANSFER";
+  reason?: string;
+  fromWarehouseId?: string;
+  toWarehouseId?: string;
 }
 
 export interface StockMovementResponse {
@@ -10,7 +12,10 @@ export interface StockMovementResponse {
   productId: string;
   quantity: number;
   movementType: string;
-  reason: string;
+  status: string;
+  reason: string | null;
+  fromWarehouseId: string | null;
+  toWarehouseId: string | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

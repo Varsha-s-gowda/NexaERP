@@ -46,11 +46,33 @@ export class CustomerService {
     return customer;
   }
 
-  async getAll(userId: string, userRole: Role): Promise<CustomerResponse[]> {
+  async getAll(
+    userId: string,
+    userRole: Role,
+    search?: string,
+    customerType?: string,
+    status?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ customers: CustomerResponse[]; total: number }> {
     if (userRole === Role.ADMIN || userRole === Role.ACCOUNTS) {
-      return await this.customerRepository.findAll();
+      return await this.customerRepository.findAll(
+        undefined,
+        search,
+        customerType,
+        status,
+        page,
+        limit
+      );
     }
-    return await this.customerRepository.findAll(userId);
+    return await this.customerRepository.findAll(
+      userId,
+      search,
+      customerType,
+      status,
+      page,
+      limit
+    );
   }
 
   async update(id: string, data: UpdateCustomerRequest, userId: string, userRole: Role): Promise<CustomerResponse> {

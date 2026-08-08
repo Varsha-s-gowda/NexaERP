@@ -70,7 +70,14 @@ export class ProductController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const result = await this.productService.getAll();
+      const search = req.query.search as string | undefined;
+      const category = req.query.category as string | undefined;
+      const status = req.query.status as string | undefined;
+      const warehouseId = req.query.warehouseId as string | undefined;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const result = await this.productService.getAll(search, category, status, warehouseId, page, limit);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(

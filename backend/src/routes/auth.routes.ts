@@ -4,7 +4,7 @@ import { AuthController } from "../controllers/auth.controller.js";
 import { AuthService } from "../services/auth.service.js";
 import { AuthRepository } from "../repositories/auth.repository.js";
 
-import { loginValidator } from "../validators/auth.validator.js";
+import { loginValidator, registerValidator } from "../validators/auth.validator.js";
 import { validate } from "../middleware/validate.middleware.js";
 
 const router = Router();
@@ -81,6 +81,77 @@ router.post(
   loginValidator,
   validate,
   authController.login.bind(authController)
+);
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: User registration
+ *     description: Register a new user account
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fullName
+ *               - email
+ *               - password
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: password123
+ *     responses:
+ *       201:
+ *         description: Registration successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 201
+ *                 message:
+ *                   type: string
+ *                   example: Registration successful
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       409:
+ *         description: Email already registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiError'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiError'
+ */
+router.post(
+  "/register",
+  registerValidator,
+  validate,
+  authController.register.bind(authController)
 );
 
 export default router;
