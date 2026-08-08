@@ -12,6 +12,7 @@ import Warehouses from './pages/Warehouses';
 import StockMovements from './pages/StockMovements';
 import SalesChallans from './pages/SalesChallans';
 import Reports from './pages/reports';
+import Settings from './pages/Settings';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -111,6 +112,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Reports />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         }
       />
