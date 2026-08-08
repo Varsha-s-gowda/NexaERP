@@ -32,9 +32,14 @@ app.use(helmet());
 
 // CORS Configuration
 const cleanFrontendUrl = FRONTEND_URL.replace(/\/$/, "");
-const corsOrigins = NODE_ENV === 'development' 
-  ? ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:3000']
-  : [cleanFrontendUrl];
+const corsOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174', 
+  'http://localhost:5175', 
+  'http://localhost:5176', 
+  'http://localhost:3000',
+  cleanFrontendUrl
+];
 
 app.use(
   cors({
