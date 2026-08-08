@@ -41,15 +41,17 @@ const corsOrigins = [
   'http://localhost:5175', 
   'http://localhost:5176', 
   'http://localhost:3000',
+  'https://nexa-erp-delta.vercel.app',
   cleanFrontendUrl
 ];
 
 app.use(
   cors({
     origin: corsOrigins,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true,
+    optionsSuccessStatus: 200,
   })
 );
 
