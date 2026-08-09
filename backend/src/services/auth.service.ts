@@ -101,7 +101,6 @@ export class AuthService {
   }
 
   async updateUser(id: string, data: any) {
-    // allow updating fullName, role, isActive, and password
     const updateData: any = {};
     if (data.fullName) updateData.fullName = data.fullName;
     if (data.role && ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'].includes(data.role)) updateData.role = data.role;

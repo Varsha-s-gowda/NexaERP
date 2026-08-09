@@ -23,17 +23,13 @@ import { swaggerSpec } from "./config/swagger.js";
 
 const app: Application = express();
 
-// Trust Render's proxy for rate limiting
 app.set("trust proxy", 1);
 
-// Environment variables
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const NODE_ENV = process.env.NODE_ENV || "development";
 
-// Security Middleware
 app.use(helmet());
 
-// CORS Configuration
 const cleanFrontendUrl = FRONTEND_URL.replace(/\/$/, "");
 const corsOrigins = [
   'http://localhost:5173', 
@@ -55,16 +51,13 @@ app.use(
   })
 );
 
-// Request Logging (Morgan) - Skip in test environment
 if (NODE_ENV !== "test") {
   app.use(morgan("combined"));
 }
 
-// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -77,17 +70,13 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply rate limiter to all API routes
 app.use("/api", limiter);
 
-// Other middleware
 app.use(compression());
 app.use(cookieParser());
 
-// Health Check Route (no authentication required)
 app.use("/api", healthRoutes);
 
-// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/customers", followUpRoutes);
@@ -98,7 +87,6 @@ app.use("/api/sales-challans", salesChallanRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 
-// Root check
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
@@ -106,10 +94,8 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-// Swagger Documentation
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 404 Handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
@@ -117,7 +103,6 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-// Global Error Handler
 app.use(errorHandler);
 
 export default app;

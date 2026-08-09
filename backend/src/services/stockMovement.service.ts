@@ -25,7 +25,6 @@ export class StockMovementService {
       );
     }
 
-    // Validate warehouse requirements based on movement type
     if (data.movementType === "IN") {
       if (!data.toWarehouseId) {
         throw new ApiError(
@@ -55,7 +54,6 @@ export class StockMovementService {
       }
     }
 
-    // Check stock availability for OUT and TRANSFER
     if (data.movementType === "OUT" || data.movementType === "TRANSFER") {
       const currentStock = await this.stockMovementRepository.getProductStock(
         data.productId
@@ -83,10 +81,7 @@ export class StockMovementService {
         },
       });
 
-      // Handle stock updates based on movement type
       if (data.movementType === "IN") {
-        // For STOCK IN, we need to find or create product in destination warehouse
-        // Since products have a single warehouseId in current schema, we update the main product
         const product = await tx.product.findUnique({
           where: { id: data.productId },
         });
@@ -115,9 +110,6 @@ export class StockMovementService {
           data: { stockQuantity: newStock },
         });
       } else if (data.movementType === "TRANSFER") {
-        // TRANSFER: Decrease from source, increase to destination
-        // Since current schema has single warehouseId per product, we just update the main stock
-        // In a more complex schema, we'd track stock per warehouse
         const product = await tx.product.findUnique({
           where: { id: data.productId },
         });
@@ -126,9 +118,6 @@ export class StockMovementService {
           throw new Error("Product not found");
         }
 
-        // For TRANSFER, net stock change is 0 (just moving between warehouses)
-        // But we still record the movement
-        // In current schema, we don't track per-warehouse stock, so we just log the transfer
       }
 
       return stockMovement;

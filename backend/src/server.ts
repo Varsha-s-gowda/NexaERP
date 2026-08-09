@@ -4,7 +4,6 @@ import { validateEnv } from "./utils/envValidation.js";
 import { setupGracefulShutdown } from "./utils/gracefulShutdown.js";
 import { prisma } from "./lib/prisma.js";
 
-// Validate environment variables
 validateEnv();
 
 const PORT = process.env.PORT || 3000;
@@ -12,7 +11,6 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const server = app.listen(PORT, async () => {
-  // Test database connection
   try {
     await prisma.$queryRaw`SELECT 1`;
     console.log("✅ Database connected");
@@ -21,7 +19,6 @@ const server = app.listen(PORT, async () => {
     process.exit(1);
   }
 
-  // Print startup information
   console.log("\n" + "=".repeat(50));
   console.log("🚀 NexaERP Backend Server");
   console.log("=".repeat(50));
@@ -35,5 +32,4 @@ const server = app.listen(PORT, async () => {
   console.log("=".repeat(50) + "\n");
 });
 
-// Setup graceful shutdown
 setupGracefulShutdown(server);

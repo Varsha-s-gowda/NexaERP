@@ -5,12 +5,10 @@ export function setupGracefulShutdown(server: any): void {
     console.log(`\n📢 ${signal} received. Starting graceful shutdown...`);
 
     try {
-      // Stop accepting new connections
       server.close(() => {
         console.log("✅ HTTP server closed");
       });
 
-      // Disconnect from database
       await prisma.$disconnect();
       console.log("✅ Database disconnected");
 
@@ -22,20 +20,16 @@ export function setupGracefulShutdown(server: any): void {
     }
   };
 
-  // Handle SIGINT (Ctrl+C)
   process.on("SIGINT", () => shutdown("SIGINT"));
 
-  // Handle SIGTERM
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 
-  // Handle uncaught exceptions
   process.on("uncaughtException", async (error: Error) => {
     console.error("❌ Uncaught Exception:", error);
     await prisma.$disconnect();
     process.exit(1);
   });
 
-  // Handle unhandled promise rejections
   process.on("unhandledRejection", async (reason: unknown) => {
     console.error("❌ Unhandled Promise Rejection:", reason);
     await prisma.$disconnect();

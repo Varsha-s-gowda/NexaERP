@@ -36,7 +36,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   const role = user?.role;
 
-  // Role-based visibility
+  
   const visibleItems = allItems.filter((item) => {
     if (role === 'ADMIN') return true;
     if (role === 'SALES') {
