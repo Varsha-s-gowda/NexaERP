@@ -98,6 +98,14 @@ app.use("/api/sales-challans", salesChallanRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 
+// Root check
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "NexaERP Backend API is running",
+  });
+});
+
 // Swagger Documentation
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
