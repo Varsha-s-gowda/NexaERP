@@ -2,6 +2,21 @@
 
 A production-quality Mini ERP + CRM Operations Portal.
 
+VERCEL DEPLOYMENT LINK : https://nexa-erp-delta.vercel.app/login
+RENDER DEPLOYEMENT LINK : https://nexaerp-k2ho.onrender.com
+
+## login credentials
+
+| Role | Email / Username | Password |
+
+| ADMIN | `admin@nexaerp.com` | `admin123` |
+| SALES | `sales@nexaerp.com` | `Test@12345` |
+| ACCOUNTS | `accounts@nexaerp.com` | `Test@12345` |
+| WAREHOUSE | `warehouse@nexaerp.com` | `Test@12345` |
+
+ **Login:** Use the email address as the username.
+
+
 ## Project Structure
 
 ```
