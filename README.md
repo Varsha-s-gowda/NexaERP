@@ -8,7 +8,7 @@ RENDER DEPLOYEMENT LINK : https://nexaerp-k2ho.onrender.com
 ## login credentials
 
 | Role | Email / Username | Password |
-
+|---|---|---|
 | ADMIN | `admin@nexaerp.com` | `admin123` |
 | SALES | `sales@nexaerp.com` | `Test@12345` |
 | ACCOUNTS | `accounts@nexaerp.com` | `Test@12345` |
@@ -16,7 +16,7 @@ RENDER DEPLOYEMENT LINK : https://nexaerp-k2ho.onrender.com
 
  **Login:** Use the email address as the username.
 
-
+ 
 ## Project Structure
 
 ```
