@@ -101,3 +101,10 @@ npm run dev
 - Consistent naming conventions
 - Proper error handling
 - Proper validation
+
+
+## Known Limitations
+
+NexaERP provides basic payment tracking and is not intended to replace a complete accounting or financial management system.
+
+Notifications are currently handled through in-application alerts; external email/SMS notification workflows are not included.

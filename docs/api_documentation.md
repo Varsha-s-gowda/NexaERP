@@ -4,6 +4,12 @@ This document provides a comprehensive reference of all REST API endpoints expos
 
 ---
 
+*Version:* v1
+*Base URL (Development):* https://nexa-erp-delta.vercel.app/
+*Base URL (Production):* https://nexaerp-k2ho.onrender.com
+*Auth:* JWT Bearer Token
+*Content-Type:* application/json
+
 ## Global API Features
 
 ### Base URL
