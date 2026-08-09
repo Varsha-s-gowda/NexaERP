@@ -283,6 +283,7 @@ export default function SalesChallans() {
   const [selectedChallan, setSelectedChallan] = useState<SalesChallan | null>(null);
   const [newStatus, setNewStatus] = useState<'CONFIRMED' | 'CANCELLED'>('CONFIRMED');
   const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
+  const [menuCoords, setMenuCoords] = useState<{ top: number; left: number } | null>(null);
 
   // Line items state for create form
   const [lineItems, setLineItems] = useState<LineItem[]>([{ productId: '', quantity: 1 }]);
@@ -845,90 +846,21 @@ export default function SalesChallans() {
                              <td className="px-4 py-2 whitespace-nowrap text-right">
                                <div className="relative inline-block">
                                  <button
-                                   onClick={() =>
+                                   onClick={(e) => {
+                                     const rect = e.currentTarget.getBoundingClientRect();
+                                     setMenuCoords({
+                                       top: rect.bottom + window.scrollY,
+                                       left: rect.right - 208 + window.scrollX,
+                                     });
                                      setActionMenuOpen(
                                        actionMenuOpen === challan.id ? null : challan.id
-                                     )
-                                   }
+                                     );
+                                   }}
                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                  >
                                    <MoreVertical className="h-5 w-5 text-gray-500" />
                                  </button>
-
-                                 {actionMenuOpen === challan.id && (
-                                   <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
-                                     {/* View */}
-                                     <button
-                                       onClick={() => handleView(challan)}
-                                       className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                     >
-                                       <Eye className="h-4 w-4" />
-                                       View Details
-                                     </button>
-
-                                     {/* Print */}
-                                     <button
-                                       onClick={() => {
-                                         setActionMenuOpen(null);
-                                         printChallan(challan);
-                                       }}
-                                       className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                     >
-                                       <Printer className="h-4 w-4" />
-                                       Print Challan
-                                     </button>
-
-                                     {/* PDF Download */}
-                                     <button
-                                       onClick={() => {
-                                         setActionMenuOpen(null);
-                                         printChallan(challan);
-                                       }}
-                                       className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                     >
-                                       <Download className="h-4 w-4" />
-                                       Download PDF
-                                     </button>
-
-                                     {/* Record Payment — only ADMIN or ACCOUNTS, only CONFIRMED, not fully paid */}
-                                     {canRecordPayment && challan.status === 'CONFIRMED' && challan.paymentStatus !== 'PAID' && (
-                                       <button
-                                         onClick={() => {
-                                           setActionMenuOpen(null);
-                                           setSelectedChallan(challan);
-                                           setShowPaymentModal(true);
-                                         }}
-                                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-blue-700 hover:bg-gray-50 font-semibold"
-                                       >
-                                         <DollarSign className="h-4 w-4" />
-                                         Record Payment
-                                       </button>
-                                     )}
-
-                                     {/* Confirm — only ADMIN, only DRAFT */}
-                                     {isAdmin && challan.status === 'DRAFT' && (
-                                       <button
-                                         onClick={() => handleStatusChange(challan, 'CONFIRMED')}
-                                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-green-700 hover:bg-gray-50"
-                                       >
-                                         <CheckCircle className="h-4 w-4" />
-                                         Confirm Challan
-                                       </button>
-                                     )}
-
-                                     {/* Cancel — only ADMIN, not already cancelled */}
-                                     {isAdmin && challan.status !== 'CANCELLED' && (
-                                       <button
-                                         onClick={() => handleStatusChange(challan, 'CANCELLED')}
-                                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                                       >
-                                         <Trash2 className="h-4 w-4" />
-                                         Cancel Challan
-                                       </button>
-                                     )}
-                                   </div>
-                                 )}
-                              </div>
+                               </div>
                             </td>
                           </tr>
                         );
@@ -1577,6 +1509,102 @@ export default function SalesChallans() {
           </div>
         </div>
       )}
+
+      {/* Absolute/Fixed Action Menu Dropdown */}
+      {actionMenuOpen && menuCoords && (() => {
+        const challan = challans.find((c) => c.id === actionMenuOpen);
+        if (!challan) return null;
+        return (
+          <div
+            style={{
+              position: 'absolute',
+              top: menuCoords.top,
+              left: menuCoords.left,
+              zIndex: 9999,
+            }}
+            className="w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1"
+          >
+            {/* View */}
+            <button
+              onClick={() => {
+                setActionMenuOpen(null);
+                handleView(challan);
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+            >
+              <Eye className="h-4 w-4" />
+              View Details
+            </button>
+
+            {/* Print */}
+            <button
+              onClick={() => {
+                setActionMenuOpen(null);
+                printChallan(challan);
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+            >
+              <Printer className="h-4 w-4" />
+              Print Challan
+            </button>
+
+            {/* PDF Download */}
+            <button
+              onClick={() => {
+                setActionMenuOpen(null);
+                printChallan(challan);
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+            >
+              <Download className="h-4 w-4" />
+              Download PDF
+            </button>
+
+            {/* Record Payment — only ADMIN or ACCOUNTS, only CONFIRMED, not fully paid */}
+            {canRecordPayment && challan.status === 'CONFIRMED' && challan.paymentStatus !== 'PAID' && (
+              <button
+                onClick={() => {
+                  setActionMenuOpen(null);
+                  setSelectedChallan(challan);
+                  setShowPaymentModal(true);
+                }}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-blue-700 hover:bg-gray-50 font-semibold text-left"
+              >
+                <DollarSign className="h-4 w-4" />
+                Record Payment
+              </button>
+            )}
+
+            {/* Confirm — only ADMIN, only DRAFT */}
+            {isAdmin && challan.status === 'DRAFT' && (
+              <button
+                onClick={() => {
+                  setActionMenuOpen(null);
+                  handleStatusChange(challan, 'CONFIRMED');
+                }}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-green-700 hover:bg-gray-50 text-left"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Confirm Challan
+              </button>
+            )}
+
+            {/* Cancel — only ADMIN, not already cancelled */}
+            {isAdmin && challan.status !== 'CANCELLED' && (
+              <button
+                onClick={() => {
+                  setActionMenuOpen(null);
+                  handleStatusChange(challan, 'CANCELLED');
+                }}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50 text-left"
+              >
+                <Trash2 className="h-4 w-4" />
+                Cancel Challan
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Close action menus when clicking outside */}
       {actionMenuOpen && (
