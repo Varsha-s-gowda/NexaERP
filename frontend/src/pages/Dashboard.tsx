@@ -94,10 +94,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      
-      <div className="flex-1 flex flex-col lg:ml-64">
+
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
-        
+
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {hasError && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">

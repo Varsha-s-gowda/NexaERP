@@ -90,7 +90,7 @@ interface CustomersResponse {
 export default function Customers() {
   const queryClient = useQueryClient();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   // Search and filter state
   const [search, setSearch] = useState('');
   const [customerType, setCustomerType] = useState('');
@@ -338,10 +338,10 @@ export default function Customers() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      
-      <div className="flex-1 flex flex-col lg:ml-64">
+
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
-        
+
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {/* Header */}
           <div className="mb-6">
@@ -719,7 +719,7 @@ export default function Customers() {
                     Add Follow-up
                   </button>
                 </div>
-                
+
                 {followUps && followUps.length > 0 ? (
                   <div className="space-y-3">
                     {followUps.map((followUp) => (

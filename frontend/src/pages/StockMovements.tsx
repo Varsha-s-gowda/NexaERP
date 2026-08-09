@@ -221,14 +221,14 @@ export default function StockMovements() {
 
   // Filter movements
   const filteredMovements = movements.filter((movement) => {
-    const matchesSearch = 
+    const matchesSearch =
       movement.id.toLowerCase().includes(search.toLowerCase()) ||
       getProductName(movement.productId).toLowerCase().includes(search.toLowerCase());
-    const matchesType = 
-      typeFilter === '' || 
+    const matchesType =
+      typeFilter === '' ||
       movement.movementType === typeFilter;
-    const matchesWarehouse = 
-      warehouseFilter === '' || 
+    const matchesWarehouse =
+      warehouseFilter === '' ||
       movement.fromWarehouseId === warehouseFilter ||
       movement.toWarehouseId === warehouseFilter;
     return matchesSearch && matchesType && matchesWarehouse;
@@ -236,7 +236,7 @@ export default function StockMovements() {
 
   const exportToCSV = () => {
     if (!movements.length) return;
-    
+
     const headers = ['ID', 'Product', 'Type', 'Quantity', 'From Warehouse', 'To Warehouse', 'Status', 'Date'];
     const csvContent = [
       headers.join(','),
@@ -266,10 +266,10 @@ export default function StockMovements() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      
-      <div className="flex-1 flex flex-col lg:ml-64">
+
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
-        
+
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {/* Breadcrumb */}
           <div className="mb-4">

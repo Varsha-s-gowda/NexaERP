@@ -407,7 +407,7 @@ export default function SalesChallans() {
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-      <div className="flex-1 flex flex-col lg:ml-64">
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
@@ -1205,9 +1205,8 @@ export default function SalesChallans() {
             </div>
             <div className="p-6">
               <div
-                className={`flex items-center gap-3 p-4 rounded-lg mb-4 ${
-                  newStatus === 'CONFIRMED' ? 'bg-green-50' : 'bg-red-50'
-                }`}
+                className={`flex items-center gap-3 p-4 rounded-lg mb-4 ${newStatus === 'CONFIRMED' ? 'bg-green-50' : 'bg-red-50'
+                  }`}
               >
                 {newStatus === 'CONFIRMED' ? (
                   <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
@@ -1216,18 +1215,16 @@ export default function SalesChallans() {
                 )}
                 <div>
                   <p
-                    className={`font-medium ${
-                      newStatus === 'CONFIRMED' ? 'text-green-800' : 'text-red-800'
-                    }`}
+                    className={`font-medium ${newStatus === 'CONFIRMED' ? 'text-green-800' : 'text-red-800'
+                      }`}
                   >
                     {newStatus === 'CONFIRMED'
                       ? 'Confirm this challan?'
                       : 'Cancel this challan?'}
                   </p>
                   <p
-                    className={`text-sm mt-1 ${
-                      newStatus === 'CONFIRMED' ? 'text-green-700' : 'text-red-700'
-                    }`}
+                    className={`text-sm mt-1 ${newStatus === 'CONFIRMED' ? 'text-green-700' : 'text-red-700'
+                      }`}
                   >
                     {newStatus === 'CONFIRMED'
                       ? 'Stock will be deducted from inventory once confirmed.'
@@ -1269,11 +1266,10 @@ export default function SalesChallans() {
                     })
                   }
                   disabled={updateStatusMutation.isPending}
-                  className={`flex items-center gap-2 px-6 py-2 text-white rounded-lg transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed ${
-                    newStatus === 'CONFIRMED'
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-red-600 hover:bg-red-700'
-                  }`}
+                  className={`flex items-center gap-2 px-6 py-2 text-white rounded-lg transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed ${newStatus === 'CONFIRMED'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                    }`}
                 >
                   {updateStatusMutation.isPending ? (
                     <>

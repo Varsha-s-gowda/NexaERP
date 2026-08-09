@@ -679,7 +679,7 @@ export default function Reports() {
         setIsOpen={setSidebarOpen}
       />
 
-      <div className="flex-1 flex flex-col lg:ml-64">
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
@@ -927,27 +927,27 @@ export default function Reports() {
                     ? salesStats.totalRevenue
                     : reportType === 'customers'
                       ? customerReportData.reduce(
+                        (sum, item) =>
+                          sum + item.totalRevenue,
+                        0
+                      )
+                      : reportType === 'products'
+                        ? productReportData.reduce(
                           (sum, item) =>
                             sum + item.totalRevenue,
                           0
                         )
-                      : reportType === 'products'
-                        ? productReportData.reduce(
+                        : reportType === 'top-selling'
+                          ? topSellingData.reduce(
                             (sum, item) =>
                               sum + item.totalRevenue,
                             0
                           )
-                        : reportType === 'top-selling'
-                          ? topSellingData.reduce(
-                              (sum, item) =>
-                                sum + item.totalRevenue,
-                              0
-                            )
                           : inventoryData.reduce(
-                              (sum, item) =>
-                                sum + item.totalValue,
-                              0
-                            )
+                            (sum, item) =>
+                              sum + item.totalValue,
+                            0
+                          )
                 )}
               </div>
             </div>
@@ -968,21 +968,21 @@ export default function Reports() {
                   ? salesStats.productsSold
                   : reportType === 'products'
                     ? productReportData.reduce(
+                      (sum, item) =>
+                        sum + item.totalQuantitySold,
+                      0
+                    )
+                    : reportType === 'top-selling'
+                      ? topSellingData.reduce(
                         (sum, item) =>
                           sum + item.totalQuantitySold,
                         0
                       )
-                    : reportType === 'top-selling'
-                      ? topSellingData.reduce(
-                          (sum, item) =>
-                            sum + item.totalQuantitySold,
-                          0
-                        )
                       : inventoryData.reduce(
-                          (sum, item) =>
-                            sum + item.stockQuantity,
-                          0
-                        )}
+                        (sum, item) =>
+                          sum + item.stockQuantity,
+                        0
+                      )}
               </div>
             </div>
 

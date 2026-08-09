@@ -91,7 +91,7 @@ export default function Products() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useAuth();
   const role = user?.role;
-  
+
   // Search and filter state
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -118,7 +118,7 @@ export default function Products() {
       if (warehouseId) params.append('warehouseId', warehouseId);
       params.append('page', page.toString());
       params.append('limit', limit.toString());
-      
+
       const response = await api.get(`/products?${params.toString()}`);
       return response.data.data as ProductsResponse;
     },
@@ -283,7 +283,7 @@ export default function Products() {
 
   const exportToCSV = () => {
     if (!productsData?.products) return;
-    
+
     const headers = ['Product Code', 'Product Name', 'Category', 'Purchase Price', 'Selling Price', 'GST %', 'Stock', 'Min Stock', 'Status', 'Warehouse'];
     const csvContent = [
       headers.join(','),
@@ -319,10 +319,10 @@ export default function Products() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      
-      <div className="flex-1 flex flex-col lg:ml-64">
+
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
-        
+
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>

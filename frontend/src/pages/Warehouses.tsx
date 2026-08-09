@@ -211,18 +211,18 @@ export default function Warehouses() {
 
   // Get low stock count for a warehouse
   const getLowStockCount = (warehouseId: string) => {
-    return products.filter((p: any) => 
+    return products.filter((p: any) =>
       p.warehouseId === warehouseId && p.stockQuantity <= p.minimumStock
     ).length;
   };
 
   // Filter warehouses
   const filteredWarehouses = warehouses.filter((warehouse) => {
-    const matchesSearch = 
+    const matchesSearch =
       warehouse.name.toLowerCase().includes(search.toLowerCase()) ||
       warehouse.location.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = 
-      statusFilter === '' || 
+    const matchesStatus =
+      statusFilter === '' ||
       (statusFilter === 'ACTIVE' && warehouse.isActive) ||
       (statusFilter === 'INACTIVE' && !warehouse.isActive);
     return matchesSearch && matchesStatus;
@@ -231,10 +231,10 @@ export default function Warehouses() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      
-      <div className="flex-1 flex flex-col lg:ml-64">
+
+      <div className="flex-1 flex flex-col">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
-        
+
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {/* Breadcrumb */}
           <div className="mb-4">
