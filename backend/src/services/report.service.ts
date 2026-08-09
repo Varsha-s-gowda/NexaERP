@@ -18,6 +18,7 @@ export class ReportService {
     endDate?: string;
     customerId?: string;
     status?: string;
+    paymentStatus?: string;
   }, userRole: Role): Promise<SalesReportResponse[]> {
     if (userRole === Role.WAREHOUSE) {
       throw new ApiError(
@@ -43,6 +44,10 @@ export class ReportService {
 
     if (filters.status) {
       queryFilters.status = filters.status;
+    }
+
+    if (filters.paymentStatus) {
+      queryFilters.paymentStatus = filters.paymentStatus;
     }
 
     return await this.reportRepository.getSalesReport(queryFilters);

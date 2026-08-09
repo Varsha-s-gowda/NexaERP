@@ -30,6 +30,9 @@ export interface SalesChallanResponse {
   customerId: string;
   totalQuantity: number;
   totalAmount: number;
+  amountPaid: number;
+  outstandingAmount: number;
+  paymentStatus: "PAID" | "PARTIALLY_PAID" | "PENDING";
   status: string;
   createdBy: string;
   items: SalesChallanItemResponse[];

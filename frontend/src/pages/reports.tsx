@@ -74,6 +74,18 @@ const getMonthLabel = (date: string) =>
     year: 'numeric',
   });
 
+const getPaymentStatusColor = (status: string) => {
+  switch (status) {
+    case 'PAID':
+      return 'bg-green-100 text-green-800';
+    case 'PARTIALLY_PAID':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'PENDING':
+    default:
+      return 'bg-red-100 text-red-800';
+  }
+};
+
 export default function Reports() {
   const { user } = useAuth();
   const role = user?.role;
@@ -90,6 +102,7 @@ export default function Reports() {
   const [warehouseId, setWarehouseId] = useState('');
   const [customerId, setCustomerId] = useState('');
   const [status, setStatus] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -161,6 +174,7 @@ export default function Reports() {
       dateRange,
       customerId,
       status,
+      paymentStatusFilter,
     ],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -235,6 +249,10 @@ export default function Reports() {
 
       if (status) {
         params.append('status', status);
+      }
+
+      if (paymentStatusFilter) {
+        params.append('paymentStatus', paymentStatusFilter);
       }
 
       const query = params.toString();
@@ -388,28 +406,37 @@ export default function Reports() {
    */
 
   const salesStats = useMemo(() => {
-    const totalSales = salesData.filter(
-      (item) => item.status === 'CONFIRMED'
+    const confirmedSales = salesData.filter((item) => item.status === 'CONFIRMED');
+    const totalSales = confirmedSales.length;
+
+    const totalRevenue = confirmedSales.reduce(
+      (sum, item) => sum + Number(item.totalAmount || 0),
+      0
+    );
+
+    const productsSold = confirmedSales.reduce(
+      (sum, item) => sum + Number(item.totalQuantity || 0),
+      0
+    );
+
+    const totalCollected = confirmedSales.reduce(
+      (sum, item) => sum + Number(item.amountPaid || 0),
+      0
+    );
+
+    const totalOutstanding = Math.max(0, totalRevenue - totalCollected);
+
+    const pendingPayments = confirmedSales.filter(
+      (item) => item.paymentStatus === 'PENDING' || item.paymentStatus === 'PARTIALLY_PAID'
     ).length;
-
-    const totalRevenue = salesData
-      .filter((item) => item.status === 'CONFIRMED')
-      .reduce(
-        (sum, item) => sum + Number(item.totalAmount || 0),
-        0
-      );
-
-    const productsSold = salesData
-      .filter((item) => item.status === 'CONFIRMED')
-      .reduce(
-        (sum, item) => sum + Number(item.totalQuantity || 0),
-        0
-      );
 
     return {
       totalSales,
       totalRevenue,
       productsSold,
+      totalCollected,
+      totalOutstanding,
+      pendingPayments,
       stockMovements: 0,
     };
   }, [salesData]);
@@ -476,6 +503,7 @@ export default function Reports() {
     setWarehouseId('');
     setCustomerId('');
     setStatus('');
+    setPaymentStatusFilter('');
     setPage(1);
   };
 
@@ -725,7 +753,7 @@ export default function Reports() {
           {/* FILTERS */}
 
           <section className="mb-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-slate-600">
                   Report Type
@@ -870,6 +898,27 @@ export default function Reports() {
                   <option value="CANCELLED">Cancelled</option>
                 </select>
               </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+                  Payment Status
+                </label>
+
+                <select
+                  value={paymentStatusFilter}
+                  onChange={(e) => {
+                    setPaymentStatusFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  disabled={reportType !== 'sales'}
+                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none disabled:bg-slate-50"
+                >
+                  <option value="">All Payment Status</option>
+                  <option value="PAID">Paid</option>
+                  <option value="PARTIALLY_PAID">Partially Paid</option>
+                  <option value="PENDING">Pending</option>
+                </select>
+              </div>
             </div>
 
             <div className="mt-4 flex gap-2">
@@ -891,125 +940,170 @@ export default function Reports() {
 
           {/* KPI CARDS */}
 
-          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500">
-                  Total Sales
-                </span>
+          {/* KPI CARDS */}
 
-                <div className="rounded-md bg-emerald-50 p-2 text-emerald-600">
-                  <TrendingUp size={18} />
+          {reportType === 'sales' ? (
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {/* Total Revenue */}
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">Total Revenue</span>
+                  <div className="rounded-md bg-blue-50 p-2 text-blue-600">
+                    <BarChart3 size={18} />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-slate-900">
+                  {formatCurrency(salesStats.totalRevenue)}
                 </div>
               </div>
 
-              <div className="text-2xl font-bold text-slate-900">
-                {reportType === 'sales'
-                  ? salesStats.totalSales
-                  : activeData.length}
+              {/* Collected */}
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">Collected Amount</span>
+                  <div className="rounded-md bg-emerald-50 p-2 text-emerald-600">
+                    <TrendingUp size={18} />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-green-600">
+                  {formatCurrency(salesStats.totalCollected)}
+                </div>
+              </div>
+
+              {/* Outstanding */}
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">Outstanding Amount</span>
+                  <div className="rounded-md bg-red-50 p-2 text-red-600">
+                    <Package size={18} />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-red-600">
+                  {formatCurrency(salesStats.totalOutstanding)}
+                </div>
+              </div>
+
+              {/* Pending Payments */}
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">Pending Payments</span>
+                  <div className="rounded-md bg-orange-50 p-2 text-orange-600">
+                    <ShoppingCart size={18} />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-amber-600">
+                  {salesStats.pendingPayments} invoices
+                </div>
               </div>
             </div>
+          ) : (
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">
+                    Total Sales
+                  </span>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500">
-                  Total Revenue
-                </span>
+                  <div className="rounded-md bg-emerald-50 p-2 text-emerald-600">
+                    <TrendingUp size={18} />
+                  </div>
+                </div>
 
-                <div className="rounded-md bg-blue-50 p-2 text-blue-600">
-                  <BarChart3 size={18} />
+                <div className="text-2xl font-bold text-slate-900">
+                  {activeData.length}
                 </div>
               </div>
 
-              <div className="text-2xl font-bold text-slate-900">
-                {formatCurrency(
-                  reportType === 'sales'
-                    ? salesStats.totalRevenue
-                    : reportType === 'customers'
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">
+                    Total Revenue
+                  </span>
+
+                  <div className="rounded-md bg-blue-50 p-2 text-blue-600">
+                    <BarChart3 size={18} />
+                  </div>
+                </div>
+
+                <div className="text-2xl font-bold text-slate-900">
+                  {formatCurrency(
+                    reportType === 'customers'
                       ? customerReportData.reduce(
-                        (sum, item) =>
-                          sum + item.totalRevenue,
-                        0
-                      )
-                      : reportType === 'products'
-                        ? productReportData.reduce(
-                          (sum, item) =>
-                            sum + item.totalRevenue,
+                          (sum, item) => sum + item.totalRevenue,
                           0
                         )
-                        : reportType === 'top-selling'
-                          ? topSellingData.reduce(
-                            (sum, item) =>
-                              sum + item.totalRevenue,
-                            0
-                          )
-                          : inventoryData.reduce(
-                            (sum, item) =>
-                              sum + item.totalValue,
-                            0
-                          )
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500">
-                  Products Sold
-                </span>
-
-                <div className="rounded-md bg-indigo-50 p-2 text-indigo-600">
-                  <Package size={18} />
+                      : reportType === 'products'
+                      ? productReportData.reduce(
+                          (sum, item) => sum + item.totalRevenue,
+                          0
+                        )
+                      : reportType === 'top-selling'
+                      ? topSellingData.reduce(
+                          (sum, item) => sum + item.totalRevenue,
+                          0
+                        )
+                      : inventoryData.reduce(
+                          (sum, item) => sum + item.totalValue,
+                          0
+                        )
+                  )}
                 </div>
               </div>
 
-              <div className="text-2xl font-bold text-slate-900">
-                {reportType === 'sales'
-                  ? salesStats.productsSold
-                  : reportType === 'products'
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">
+                    Products Sold
+                  </span>
+
+                  <div className="rounded-md bg-indigo-50 p-2 text-indigo-600">
+                    <Package size={18} />
+                  </div>
+                </div>
+
+                <div className="text-2xl font-bold text-slate-900">
+                  {reportType === 'products'
                     ? productReportData.reduce(
-                      (sum, item) =>
-                        sum + item.totalQuantitySold,
-                      0
-                    )
-                    : reportType === 'top-selling'
-                      ? topSellingData.reduce(
-                        (sum, item) =>
-                          sum + item.totalQuantitySold,
+                        (sum, item) => sum + item.totalQuantitySold,
                         0
                       )
-                      : inventoryData.reduce(
-                        (sum, item) =>
-                          sum + item.stockQuantity,
+                    : reportType === 'top-selling'
+                    ? topSellingData.reduce(
+                        (sum, item) => sum + item.totalQuantitySold,
+                        0
+                      )
+                    : inventoryData.reduce(
+                        (sum, item) => sum + item.stockQuantity,
                         0
                       )}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500">
-                  Stock Movements
-                </span>
-
-                <div className="rounded-md bg-orange-50 p-2 text-orange-600">
-                  <ShoppingCart size={18} />
                 </div>
               </div>
 
-              <div className="text-2xl font-bold text-slate-900">
-                {reportType === 'inventory'
-                  ? inventoryData.length
-                  : reportType === 'customers'
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">
+                    Items Count
+                  </span>
+
+                  <div className="rounded-md bg-orange-50 p-2 text-orange-600">
+                    <ShoppingCart size={18} />
+                  </div>
+                </div>
+
+                <div className="text-2xl font-bold text-slate-900">
+                  {reportType === 'inventory'
+                    ? inventoryData.length
+                    : reportType === 'customers'
                     ? customerReportData.length
                     : reportType === 'products'
-                      ? productReportData.length
-                      : reportType === 'top-selling'
-                        ? topSellingData.length
-                        : salesStats.stockMovements}
+                    ? productReportData.length
+                    : reportType === 'top-selling'
+                    ? topSellingData.length
+                    : 0}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* ERROR */}
 
@@ -1175,6 +1269,9 @@ export default function Reports() {
                           <th className="px-4 py-3">Customer</th>
                           <th className="px-4 py-3">Items</th>
                           <th className="px-4 py-3">Total</th>
+                          <th className="px-4 py-3">Paid</th>
+                          <th className="px-4 py-3">Outstanding</th>
+                          <th className="px-4 py-3">Payment Status</th>
                           <th className="px-4 py-3">Status</th>
                         </tr>
                       )}
@@ -1259,6 +1356,20 @@ export default function Reports() {
 
                               <td className="px-4 py-3 font-medium">
                                 {formatCurrency(item.totalAmount)}
+                              </td>
+
+                              <td className="px-4 py-3 text-green-600 font-medium">
+                                {formatCurrency(item.amountPaid || 0)}
+                              </td>
+
+                              <td className="px-4 py-3 text-red-600 font-medium">
+                                {formatCurrency(item.outstandingAmount ?? (item.totalAmount - (item.amountPaid || 0)))}
+                              </td>
+
+                              <td className="px-4 py-3">
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getPaymentStatusColor(item.paymentStatus)}`}>
+                                  {item.paymentStatus || 'PENDING'}
+                                </span>
                               </td>
 
                               <td className="px-4 py-3">

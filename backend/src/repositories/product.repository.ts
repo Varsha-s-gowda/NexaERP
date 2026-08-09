@@ -32,7 +32,8 @@ export class ProductRepository {
     status?: string,
     warehouseId?: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    inventoryStatus?: string
   ): Promise<{ products: ProductResponse[]; total: number }> {
     const where: any = {};
 
@@ -54,6 +55,21 @@ export class ProductRepository {
 
     if (warehouseId) {
       where.warehouseId = warehouseId;
+    }
+
+    if (inventoryStatus) {
+      if (inventoryStatus === "OUT_OF_STOCK") {
+        where.stockQuantity = 0;
+      } else if (inventoryStatus === "LOW_STOCK") {
+        where.stockQuantity = {
+          gt: 0,
+          lte: prisma.product.fields.minimumStock,
+        };
+      } else if (inventoryStatus === "HEALTHY") {
+        where.stockQuantity = {
+          gt: prisma.product.fields.minimumStock,
+        };
+      }
     }
 
     const [products, total] = await Promise.all([
@@ -96,6 +112,13 @@ export class ProductRepository {
   }
 
   private formatResponse(product: any): ProductResponse {
+    let inventoryStatus: "HEALTHY" | "LOW_STOCK" | "OUT_OF_STOCK" = "HEALTHY";
+    if (product.stockQuantity === 0) {
+      inventoryStatus = "OUT_OF_STOCK";
+    } else if (product.stockQuantity <= product.minimumStock) {
+      inventoryStatus = "LOW_STOCK";
+    }
+
     return {
       id: product.id,
       productCode: product.productCode,
@@ -108,6 +131,7 @@ export class ProductRepository {
       minimumStock: product.minimumStock,
       description: product.description,
       status: product.status,
+      inventoryStatus,
       warehouseId: product.warehouseId,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),

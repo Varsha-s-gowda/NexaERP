@@ -19,6 +19,9 @@ export interface DashboardSummaryResponse {
   cancelledSales: number;
   totalRevenue: number;
   todayRevenue: number;
+  totalCollected: number;
+  totalOutstanding: number;
+  pendingPaymentsCount: number;
 }
 
 export interface LowStockProductResponse {

@@ -30,56 +30,58 @@ export default function LowStockTable({ products, isLoading }: LowStockTableProp
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Low Stock Products</h3>
-        <span className="text-sm text-[#1a1a2e] cursor-pointer hover:underline">View All →</span>
+      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 className="text-sm font-semibold text-gray-900">Inventory Stock Alerts</h3>
+        <span className="text-xs text-[#1a1a2e] cursor-pointer hover:underline">View All →</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Product
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 SKU
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Current
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Min
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {products.map((product) => {
-              const stockRatio = product.stockQuantity / product.minimumStock;
-              const status =
-                stockRatio <= 0.5
-                  ? { label: 'Critical', color: 'bg-red-100 text-red-800' }
-                  : { label: 'Low Stock', color: 'bg-yellow-100 text-yellow-800' };
+              const isOutOfStock = product.stockQuantity === 0;
+              const isLowStock = product.stockQuantity <= product.minimumStock;
+              const status = isOutOfStock
+                ? { label: 'Out of Stock', color: 'bg-red-100 text-red-800' }
+                : isLowStock
+                ? { label: 'Low Stock', color: 'bg-yellow-100 text-yellow-800' }
+                : { label: 'Healthy', color: 'bg-green-100 text-green-800' };
 
               return (
                 <tr key={product.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{product.productName}</div>
-                    <div className="text-sm text-gray-500">{product.category}</div>
+                    <div className="text-xs text-gray-500">{product.category}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
                     {product.productCode}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     {product.stockQuantity}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
                     {product.minimumStock}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${status.color}`}>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <span className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${status.color}`}>
                       {status.label}
                     </span>
                   </td>

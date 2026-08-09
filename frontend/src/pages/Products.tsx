@@ -97,6 +97,7 @@ export default function Products() {
   const [category, setCategory] = useState('');
   const [status, setStatus] = useState('');
   const [warehouseId, setWarehouseId] = useState('');
+  const [inventoryStatus, setInventoryStatus] = useState('');
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
 
@@ -109,13 +110,14 @@ export default function Products() {
 
   // Fetch products with filters and pagination
   const { data: productsData, isLoading, refetch } = useQuery({
-    queryKey: ['products', search, category, status, warehouseId, page, limit],
+    queryKey: ['products', search, category, status, warehouseId, inventoryStatus, page, limit],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (category) params.append('category', category);
       if (status) params.append('status', status);
       if (warehouseId) params.append('warehouseId', warehouseId);
+      if (inventoryStatus) params.append('inventoryStatus', inventoryStatus);
       params.append('page', page.toString());
       params.append('limit', limit.toString());
 
@@ -412,14 +414,30 @@ export default function Products() {
                   ))}
                 </select>
 
+                {/* Stock Status Filter */}
+                <select
+                  value={inventoryStatus}
+                  onChange={(e) => {
+                    setInventoryStatus(e.target.value);
+                    setPage(1);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a2e] focus:border-transparent outline-none"
+                >
+                  <option value="">All Stock Status</option>
+                  <option value="HEALTHY">Healthy</option>
+                  <option value="LOW_STOCK">Low Stock</option>
+                  <option value="OUT_OF_STOCK">Out of Stock</option>
+                </select>
+
                 {/* Clear Filters */}
-                {(search || category || status || warehouseId) && (
+                {(search || category || status || warehouseId || inventoryStatus) && (
                   <button
                     onClick={() => {
                       setSearch('');
                       setCategory('');
                       setStatus('');
                       setWarehouseId('');
+                      setInventoryStatus('');
                       setPage(1);
                     }}
                     className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"

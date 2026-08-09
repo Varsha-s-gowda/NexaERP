@@ -91,9 +91,10 @@ export class ProductService {
     status?: string,
     warehouseId?: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    inventoryStatus?: string
   ): Promise<{ products: ProductResponse[]; total: number }> {
-    return await this.productRepository.findAll(search, category, status, warehouseId, page, limit);
+    return await this.productRepository.findAll(search, category, status, warehouseId, page, limit, inventoryStatus);
   }
 
   async update(id: string, data: UpdateProductRequest, userRole: Role): Promise<ProductResponse> {

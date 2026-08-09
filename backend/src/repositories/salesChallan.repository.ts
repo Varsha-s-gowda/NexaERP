@@ -125,12 +125,19 @@ export class SalesChallanRepository {
   }
 
   formatResponse(challan: any): SalesChallanResponse {
+    const totalAmount = Number(challan.totalAmount);
+    const amountPaid = Number(challan.amountPaid || 0);
+    const outstandingAmount = Math.max(0, totalAmount - amountPaid);
+
     return {
       id: challan.id,
       challanNumber: challan.challanNumber,
       customerId: challan.customerId,
       totalQuantity: challan.totalQuantity,
-      totalAmount: Number(challan.totalAmount),
+      totalAmount,
+      amountPaid,
+      outstandingAmount,
+      paymentStatus: challan.paymentStatus || "PENDING",
       status: challan.status,
       createdBy: challan.createdBy,
       items: challan.items.map((item: any) => this.formatItemResponse(item)),

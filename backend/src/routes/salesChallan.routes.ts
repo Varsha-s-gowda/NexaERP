@@ -241,4 +241,11 @@ router.patch(
   salesChallanController.updateStatus.bind(salesChallanController)
 );
 
+router.post(
+  "/:id/payment",
+  authenticate,
+  authorizeRoles(Role.ADMIN, Role.ACCOUNTS),
+  salesChallanController.recordPayment.bind(salesChallanController)
+);
+
 export default router;

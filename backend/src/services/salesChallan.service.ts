@@ -209,6 +209,66 @@ export class SalesChallanService {
     });
   }
 
+  async recordPayment(id: string, amount: number, userRole: Role): Promise<SalesChallanResponse> {
+    if (userRole !== Role.ADMIN && userRole !== Role.ACCOUNTS) {
+      throw new ApiError(
+        HTTP_STATUS.FORBIDDEN,
+        "Access denied: Only Admin or Accounts can record payments"
+      );
+    }
+
+    if (amount <= 0) {
+      throw new ApiError(
+        HTTP_STATUS.BAD_REQUEST,
+        "Payment amount must be greater than 0"
+      );
+    }
+
+    const challan = await this.salesChallanRepository.findById(id);
+    if (!challan) {
+      throw new ApiError(
+        HTTP_STATUS.NOT_FOUND,
+        "Sales challan not found"
+      );
+    }
+
+    if (challan.status !== "CONFIRMED") {
+      throw new ApiError(
+        HTTP_STATUS.BAD_REQUEST,
+        "Cannot record payment for non-confirmed sales challan"
+      );
+    }
+
+    const newPaidAmount = Number(challan.amountPaid) + amount;
+    if (newPaidAmount > challan.totalAmount) {
+      throw new ApiError(
+        HTTP_STATUS.BAD_REQUEST,
+        `Payment amount exceeds outstanding amount. Max allowed: ${challan.totalAmount - challan.amountPaid}`
+      );
+    }
+
+    let paymentStatus: "PAID" | "PARTIALLY_PAID" | "PENDING" = "PENDING";
+    if (newPaidAmount === challan.totalAmount) {
+      paymentStatus = "PAID";
+    } else if (newPaidAmount > 0) {
+      paymentStatus = "PARTIALLY_PAID";
+    }
+
+    const updatedChallan = await prisma.salesChallan.update({
+      where: { id },
+      data: {
+        amountPaid: newPaidAmount,
+        paymentStatus,
+      },
+      include: {
+        items: true,
+        customer: true,
+      },
+    });
+
+    return this.salesChallanRepository.formatResponse(updatedChallan);
+  }
+
   private async generateChallanNumber(): Promise<string> {
     const latestNumber = await this.salesChallanRepository.findLatestChallanNumber();
 

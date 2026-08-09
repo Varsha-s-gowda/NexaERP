@@ -38,6 +38,7 @@ export interface ProductResponse {
   minimumStock: number;
   description: string | null;
   status: string;
+  inventoryStatus: "HEALTHY" | "LOW_STOCK" | "OUT_OF_STOCK";
   warehouseId: string;
   createdAt: string;
   updatedAt: string;

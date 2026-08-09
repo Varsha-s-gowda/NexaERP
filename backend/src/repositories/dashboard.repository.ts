@@ -192,4 +192,25 @@ export class DashboardRepository {
 
     return Array.from(monthlyData.values());
   }
+
+  async getTotalCollected(): Promise<number> {
+    const result = await prisma.salesChallan.aggregate({
+      where: { status: "CONFIRMED" },
+      _sum: {
+        amountPaid: true,
+      },
+    });
+    return Number(result._sum.amountPaid || 0);
+  }
+
+  async getPendingPaymentsCount(): Promise<number> {
+    return await prisma.salesChallan.count({
+      where: {
+        status: "CONFIRMED",
+        paymentStatus: {
+          in: ["PENDING", "PARTIALLY_PAID"],
+        },
+      },
+    });
+  }
 }

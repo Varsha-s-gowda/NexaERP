@@ -117,6 +117,31 @@ export default function Dashboard() {
             <KPICards summary={currentSummary} isLoading={summaryLoading} />
           </div>
 
+          {/* Financial Overview (ADMIN and ACCOUNTS only) */}
+          {(role === 'ADMIN' || role === 'ACCOUNTS') && (
+            <div className="mb-6 bg-white rounded-lg border border-gray-200 p-4">
+              <h2 className="text-sm font-bold text-gray-900 mb-3">Financial Overview</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-slate-50 rounded-lg p-3 border border-gray-100">
+                  <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mb-0.5">Total Revenue</p>
+                  <p className="text-xl font-bold text-gray-900">₹{(currentSummary.totalRevenue || 0).toLocaleString()}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3 border border-gray-100">
+                  <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mb-0.5">Collected Amount</p>
+                  <p className="text-xl font-bold text-green-600">₹{(currentSummary.totalCollected || 0).toLocaleString()}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3 border border-gray-100">
+                  <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mb-0.5">Outstanding Amount</p>
+                  <p className="text-xl font-bold text-red-600">₹{(currentSummary.totalOutstanding || 0).toLocaleString()}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3 border border-gray-100">
+                  <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mb-0.5">Pending Payments</p>
+                  <p className="text-xl font-bold text-amber-600">{currentSummary.pendingPaymentsCount || 0} invoices</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Sales Chart */}
             <div className="lg:col-span-2">

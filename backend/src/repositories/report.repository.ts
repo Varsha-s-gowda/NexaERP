@@ -13,6 +13,7 @@ export class ReportRepository {
     endDate?: Date;
     customerId?: string;
     status?: string;
+    paymentStatus?: string;
   }): Promise<SalesReportResponse[]> {
     const where: any = {};
 
@@ -34,6 +35,10 @@ export class ReportRepository {
       where.status = filters.status;
     }
 
+    if (filters.paymentStatus) {
+      where.paymentStatus = filters.paymentStatus;
+    }
+
     const challans = await prisma.salesChallan.findMany({
       where,
       include: {
@@ -46,16 +51,25 @@ export class ReportRepository {
       orderBy: { createdAt: "desc" },
     });
 
-    return challans.map((challan) => ({
-      id: challan.id,
-      challanNumber: challan.challanNumber,
-      customerId: challan.customerId,
-      customerName: challan.customer.customerName,
-      totalQuantity: challan.totalQuantity,
-      totalAmount: Number(challan.totalAmount),
-      status: challan.status,
-      createdAt: challan.createdAt.toISOString(),
-    }));
+    return challans.map((challan) => {
+      const totalAmount = Number(challan.totalAmount);
+      const amountPaid = Number(challan.amountPaid || 0);
+      const outstandingAmount = Math.max(0, totalAmount - amountPaid);
+
+      return {
+        id: challan.id,
+        challanNumber: challan.challanNumber,
+        customerId: challan.customerId,
+        customerName: challan.customer.customerName,
+        totalQuantity: challan.totalQuantity,
+        totalAmount,
+        amountPaid,
+        outstandingAmount,
+        paymentStatus: challan.paymentStatus || "PENDING",
+        status: challan.status,
+        createdAt: challan.createdAt.toISOString(),
+      };
+    });
   }
 
   async getInventoryReport(): Promise<InventoryReportResponse[]> {

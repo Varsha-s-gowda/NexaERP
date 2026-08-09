@@ -5,6 +5,9 @@ export interface SalesReportResponse {
   customerName: string;
   totalQuantity: number;
   totalAmount: number;
+  amountPaid: number;
+  outstandingAmount: number;
+  paymentStatus: string;
   status: string;
   createdAt: string;
 }

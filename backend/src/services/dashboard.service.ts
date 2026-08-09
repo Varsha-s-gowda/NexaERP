@@ -31,6 +31,8 @@ export class DashboardService {
       cancelledSales,
       totalRevenue,
       todayRevenue,
+      totalCollected,
+      pendingPaymentsCount,
     ] = await Promise.all([
       this.dashboardRepository.getTotalCustomers(),
       this.dashboardRepository.getActiveCustomers(),
@@ -52,7 +54,11 @@ export class DashboardService {
       this.dashboardRepository.getCancelledSales(),
       this.dashboardRepository.getTotalSalesAmount(),
       this.dashboardRepository.getTodaySales(),
+      this.dashboardRepository.getTotalCollected(),
+      this.dashboardRepository.getPendingPaymentsCount(),
     ]);
+
+    const totalOutstanding = Math.max(0, totalRevenue - totalCollected);
 
     const summary: DashboardSummaryResponse = {
       totalCustomers: 0,
@@ -75,6 +81,9 @@ export class DashboardService {
       cancelledSales: 0,
       totalRevenue: 0,
       todayRevenue: 0,
+      totalCollected: 0,
+      totalOutstanding: 0,
+      pendingPaymentsCount: 0,
     };
 
     if (userRole === Role.ADMIN) {
@@ -99,6 +108,9 @@ export class DashboardService {
         cancelledSales,
         totalRevenue,
         todayRevenue,
+        totalCollected,
+        totalOutstanding,
+        pendingPaymentsCount,
       });
     } else if (userRole === Role.SALES) {
       Object.assign(summary, {
@@ -112,6 +124,9 @@ export class DashboardService {
         cancelledSales,
         totalRevenue,
         todayRevenue,
+        totalCollected,
+        totalOutstanding,
+        pendingPaymentsCount,
       });
     } else if (userRole === Role.WAREHOUSE) {
       Object.assign(summary, {
@@ -142,6 +157,9 @@ export class DashboardService {
         cancelledSales,
         totalRevenue,
         todayRevenue,
+        totalCollected,
+        totalOutstanding,
+        pendingPaymentsCount,
       });
     }
 

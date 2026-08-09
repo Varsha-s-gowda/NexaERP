@@ -76,8 +76,9 @@ export class ProductController {
       const warehouseId = req.query.warehouseId as string | undefined;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const inventoryStatus = req.query.inventoryStatus as string | undefined;
 
-      const result = await this.productService.getAll(search, category, status, warehouseId, page, limit);
+      const result = await this.productService.getAll(search, category, status, warehouseId, page, limit, inventoryStatus);
 
       res.status(HTTP_STATUS.OK).json(
         new ApiResponse(

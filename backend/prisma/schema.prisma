@@ -49,6 +49,12 @@ enum ChallanStatus {
   CANCELLED
 }
 
+enum PaymentStatus {
+  PAID
+  PARTIALLY_PAID
+  PENDING
+}
+
 model User {
   id       String  @id @default(uuid())
   fullName String
@@ -210,6 +216,8 @@ model SalesChallan {
   totalQuantity Int
 
   totalAmount Decimal @db.Decimal(10, 2)
+  amountPaid  Decimal @db.Decimal(10, 2) @default(0.00)
+  paymentStatus PaymentStatus @default(PENDING)
 
   status ChallanStatus @default(DRAFT)
 
@@ -223,6 +231,7 @@ model SalesChallan {
 
   @@index([challanNumber])
   @@index([customerId])
+  @@index([paymentStatus])
 }
 
 model SalesChallanItem {

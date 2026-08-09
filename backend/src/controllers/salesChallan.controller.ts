@@ -141,4 +141,46 @@ export class SalesChallanController {
       next(error);
     }
   }
+
+  async recordPayment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { amount } = req.body;
+      const userRole = (req as any).user?.role;
+
+      if (!id) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Sales challan ID is required"
+        );
+      }
+
+      if (amount === undefined || amount === null) {
+        throw new ApiError(
+          HTTP_STATUS.BAD_REQUEST,
+          "Payment amount is required"
+        );
+      }
+
+      const result = await this.salesChallanService.recordPayment(
+        id as string,
+        Number(amount),
+        userRole
+      );
+
+      res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(
+          HTTP_STATUS.OK,
+          "Payment recorded successfully",
+          result
+        )
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -14,7 +14,7 @@ export class ReportController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { startDate, endDate, customerId, status } = req.query;
+      const { startDate, endDate, customerId, status, paymentStatus } = req.query;
       const userRole = (req as any).user?.role;
 
       const result = await this.reportService.getSalesReport({
@@ -22,6 +22,7 @@ export class ReportController {
         endDate: endDate as string,
         customerId: customerId as string,
         status: status as string,
+        paymentStatus: paymentStatus as string,
       }, userRole);
 
       res.status(HTTP_STATUS.OK).json(
